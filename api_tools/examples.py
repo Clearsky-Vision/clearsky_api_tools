@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from stitching import stitch_tiles_in_folder
-from tif_creator import save_geo_tiff
+from tif_creator import save_geo_tiff, save_geo_tiffRast
 from user import User
 from search import Query, search_data
 from download import download_all
@@ -34,7 +34,7 @@ def example_1():
 def example_2():
 
     data_path = "C:/data/in/"
-    date = datetime(year=2022, month=3, day=28)
+    date = datetime(year=2022, month=3, day=27)
     zone = 32 # utm zone to use
     uint16 = True # if false, will keep data in float32
     out_name = "test"
@@ -42,7 +42,7 @@ def example_2():
 
     new_tile, new_bounds = stitch_tiles_in_folder(data_path, date, zone, uint16=uint16, resolution=0.2) # Set min_x, min_y, max_x, max_y to limit the area
 
-    save_geo_tiff(new_tile, new_bounds, out_path, out_name, uint16=uint16)
+    save_geo_tiffRast(new_tile, new_bounds, out_path, out_name, uint16=uint16)
 
 
     print("done")
@@ -50,5 +50,5 @@ def example_2():
 
 
 if __name__ == '__main__':
-    example_1()
+  #  example_1()
     example_2()
