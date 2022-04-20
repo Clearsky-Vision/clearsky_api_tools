@@ -3,8 +3,6 @@ import numpy as np
 import rasterio
 import cv2
 
-
-
 class Bounds():
     def __init__(self, epsg, min_lat, min_lon, max_lat, max_lon):
         self.epsg = epsg
@@ -13,10 +11,21 @@ class Bounds():
         self.max_lat = max_lat
         self.max_lon = max_lon
 
+def find_min_max_xy(data_path, date, zone):
 
+    files_tmp = os.listdir(data_path)
+    files = []
+    date = str(date).split(" ")[0]
+
+    for i in range(0, len(files_tmp)):
+        if date in files_tmp[i] and str(zone) + "_" in files_tmp[i]:
+            files.append(files_tmp[i])
+
+    min_x, min_y, max_x, max_y = find_min_max_pos(files)
+
+    return min_x, min_y, max_x, max_y
 
 def stitch_tiles_in_folder(data_path, date, zone, resolution=1, min_x=None, min_y=None, max_x=None, max_y=None, uint16=True):
-
 
     files_tmp = os.listdir(data_path)
     files = []

@@ -4,7 +4,7 @@ import rasterio
 from rasterio.crs import CRS
 
 
-def save_geo_tiffRast(data, bounds, save_path, file_name, uint16=True):
+def save_geo_tiff(data, bounds, save_path, file_name, uint16=True):
 
     if not os.path.exists(save_path + "/"):
         os.makedirs(save_path + "/")
@@ -19,31 +19,24 @@ def save_geo_tiffRast(data, bounds, save_path, file_name, uint16=True):
     transform = from_origin(xmin, ymax, xres, yres)
     crs = int(bounds.epsg.split(":")[1])
     crs = CRS.from_epsg(crs)
-    if uint16:
-        profile_settings = {'dtype': 'uint16',
-                            'nodata': 0,
-                            'driver': 'GTiff',
-                            'interleave': 'band',
-                            'tiled': True,
-                            'blockxsize': 256,
-                            'blockysize': 256,
-                            'compress': 'lzw'}
-    else:
-        profile_settings = {'dtype': 'float32',
-                            'nodata': 0,
-                            'driver': 'GTiff',
-                            'interleave': 'band',
-                            'tiled': True,
-                            'blockxsize': 256,
-                            'blockysize': 256,
-                            'compress': 'lzw'}
+
+    profile_settings = {'dtype': 'uint16',
+                        'nodata': 0,
+                        'driver': 'GTiff',
+                        'interleave': 'band',
+                        'tiled': True,
+                        'blockxsize': 256,
+                        'blockysize': 256,
+                        'compress': 'lzw'}
+    if not uint16:
+        profile_settings['dtype'] = 'float32'
 
 
     new_dataset = rasterio.open(save_path + file_name + '.tif', 'w', **profile_settings,
                                 height = data.shape[1], width = data.shape[2],
                                 count=10,
                                 crs=crs,
-                                transform=transform)
+                                transform=transform, BIGTIFF='YES')
 
     new_dataset.write(data[0], 1)
     new_dataset.write(data[1], 2)
