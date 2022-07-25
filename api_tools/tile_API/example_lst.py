@@ -8,7 +8,7 @@ from download_lst import download_all
 # download all files in search to data_path_out
 def example_1():
 
-    credentials = User(api_key="f3a5383cdd5b44f4a2ffacc9291eec54")
+    credentials = User(api_key="xxxxxxxxxxxx")
 
     data_path_out = "C:/cs/"
     show_progress = True # progress bar for each download
