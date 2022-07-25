@@ -37,7 +37,7 @@ def request_estimate(query):
     if resp.status_code == 200:
         return resp.json()
     else:
-        print("Your request for a job estimate has failed, please try again")
+        print("Your request for a job estimate has failed, please try again (possibly invalid parameters)")
 
 def download_raw_data(url, outfile, credentials, show_progress, start):
     processed_time = None

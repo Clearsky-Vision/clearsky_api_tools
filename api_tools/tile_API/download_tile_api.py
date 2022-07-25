@@ -12,7 +12,7 @@ def download_all(results, outpath, credentials, show_progress):
         for date in area['SatelliteImageZones']:
             print("DL Progress --- Areas: " + str(count_area) + "/" + str(len(results)) + " dates: " + str(count_date) + "/" + str(len(area['SatelliteImageZones'])))
             url = "https://api.clearsky.vision/api/satelliteimages?satelliteImageId=" + str(date['SatelliteImageId'])
-            name = outpath + "32_" + str(area['XPosition']) + "-" + str(area['YPosition']) + "_" + str(date['ImageDate']).split("T")[0] + ".tif"  # zone is hard coded until tile zone is added to api
+            name = outpath + area['Zone'] + "_" + str(area['XPosition']) + "-" + str(area['YPosition']) + "_" + str(date['ImageDate']).split("T")[0] + ".tif"
             if os.path.isfile(name):
                 print("File already exists: " + name)
                 count_date += 1
