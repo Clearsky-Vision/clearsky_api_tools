@@ -2,18 +2,25 @@ import requests
 from tqdm import tqdm
 import shutil
 from pathlib import Path
+import os
 
-def download_all(query, outpath, credentials, show_progress, filename):
+def download_all(results, outpath, credentials, show_progress):
 
+    count_area = 0
+    for area in results:
+        count_date = 0
+        for date in area['SatelliteImageZones']:
+            print("DL Progress --- Areas: " + str(count_area) + "/" + str(len(results)) + " dates: " + str(count_date) + "/" + str(len(area['SatelliteImageZones'])))
+            url = "https://api.clearsky.vision/api/satelliteimages?satelliteImageId=" + str(date['SatelliteImageId'])
+            name = outpath + "32_" + str(area['XPosition']) + "-" + str(area['YPosition']) + "_" + str(date['ImageDate']).split("T")[0] + ".tif"  # zone is hard coded until tile zone is added to api
+            if os.path.isfile(name):
+                print("File already exists: " + name)
+                count_date += 1
+                continue
+            download_raw_data(url, name, credentials, show_progress)
+            count_date += 1
+        count_area += 1
 
-    url = "https://api.clearsky.vision/api/SatelliteImages/preview/boundingbox?boundingBox=" + query.bounding_box + \
-          "&date=" + query.date + "&resolution=" + str(query.resolution) +"&epsgProjection=" + str(query.epsg_out) + "&Datatype=" + \
-          str(query.data_type) + "&bandNames=" + query.bands + "&FileType=" + query.file_type
-
-
-    name = outpath + filename
-
-    download_raw_data(url, name, credentials, show_progress)
 
 def download_raw_data(url, outfile, credentials, show_progress):
 
