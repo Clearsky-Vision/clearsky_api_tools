@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from user import User
-from search_polygon_api import Query
+from polygon_api.search_polygon_api import Query
 from polygon_api.download_polygon_api import request_data, request_estimate
 import time
 
@@ -11,12 +11,12 @@ def example_1():
     credentials = User(api_key="xxxxxxxxxxxxxxxxxxxxxx")
     show_progress = True # progress bar for each download
 
-    from_date = datetime(year=2022, month=7, day=14)
-    to_date = datetime(year=2022, month=7, day=15)
+    from_date = datetime(year=2022, month=7, day=20)
+    to_date = datetime(year=2022, month=7, day=21)
     bounding_box = "POLYGON((8.40470302590683 56.465968056026654,9.60221279153183 56.465968056026654,9.60221279153183 55.761573584491785,8.40470302590683 55.761573584491785,8.40470302590683 56.465968056026654))"
-    resolution = 50  # 10, 20, 40, 50, 100, 200
+    resolution = 20  # 10, 20, 40, 50, 100, 200
     data_type = 'uint8'  # uint8 / uint16
-    bands = 'all'  # all / rgb
+    bands = 'rgb'  # all / rgb
     epsg_out = 3857  # any epsg number # for original utmzone # 326 + zone eg. 32632 (denmark)
     file_type = 'png'  # tif / png, if png is chosen datatype will be set to uint8 and bands will be set to rgb
     out_folder = "C:/test/"

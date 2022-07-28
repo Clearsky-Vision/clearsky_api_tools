@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
 from user import User
-from search_tile_api import Query, search_data
-from download_tile_api import download_all
+from tile_API.search_tile_api import Query, search_data
+from tile_API.download_tile_api import download_all
 
 # download all files in search to data_path_out
 def example_1():
