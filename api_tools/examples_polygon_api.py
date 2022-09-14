@@ -16,10 +16,15 @@ def example_1():
     bounding_box = "POLYGON((8.40470302590683 56.465968056026654,9.60221279153183 56.465968056026654,9.60221279153183 55.761573584491785,8.40470302590683 55.761573584491785,8.40470302590683 56.465968056026654))"
     resolution = 20  # 10, 20, 40, 50, 100, 200
     data_type = 'uint8'  # uint8 / uint16
-    bands = 'rgb'  # all / rgb
-    epsg_out = 3857  # any epsg number # for original utmzone # 326 + zone eg. 32632 (denmark)
+
+    # Band options include ('rgb', 'all' or a combination of the following bands 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B11', 'B12')
+    # It is also possible to pre calculate remote sensing indices in the form (Band1 - Band2) / (Band1 + Band2)
+    # for instance NDVI would be written as [B8_B4] and will be calculated as (B8 - B4) / (B8 + B4)
+    bands = 'B4, B3, B2, B8, [B8_B4]'
+
     file_type = 'png'  # tif / png, if png is chosen datatype will be set to uint8 and bands will be set to rgb
     out_folder = "C:/test/"
+    file_type = 'tif'  # tif / png, if png is chosen datatype will be set to uint8 and bands will be set to rgb
 
 
     # For previews optimized for fast processing use the following settings: resolution = 50, data_type ='uint8' file_type = 'png'
