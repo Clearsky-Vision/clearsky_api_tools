@@ -17,7 +17,7 @@ def example_1():
     resolution = 20  # 10, 20, 40, 50, 100, 200
     data_type = 'uint8'  # uint8 / uint16
 
-    # Band options include ('rgb', 'all' or a combination of the following bands 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B11', 'B12')
+    # Band options include ('rgb', 'all' or a combination of the following bands 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12')
     # It is also possible to pre calculate remote sensing indices in the form (Band1 - Band2) / (Band1 + Band2)
     # for instance NDVI would be written as [B8_B4] and will be calculated as (B8 - B4) / (B8 + B4)
     bands = 'B4, B3, B2, B8, [B8_B4]'
