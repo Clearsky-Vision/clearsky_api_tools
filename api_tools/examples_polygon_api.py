@@ -22,7 +22,7 @@ def example_1():
     # for instance NDVI would be written as [B8_B4] and will be calculated as (B8 - B4) / (B8 + B4)
     bands = 'B4, B3, B2, B8, [B8_B4]'
 
-    file_type = 'png'  # tif / png, if png is chosen datatype will be set to uint8 and bands will be set to rgb
+
     out_folder = "C:/test/"
     file_type = 'tif'  # tif / png, if png is chosen datatype will be set to uint8 and bands will be set to rgb
 
