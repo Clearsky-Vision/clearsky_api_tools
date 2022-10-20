@@ -8,14 +8,15 @@ import time
 # download all files in search to data_path_out
 def example_1():
 
-    credentials = User(api_key="xxxxxxxxxxxxxxxxxxxxxx")
+    credentials = User(api_key="xxxxxxxxxxxxxxxxxxxxxxxxx")
     show_progress = True # progress bar for each download
+    out_folder = "C:/test/"
 
-    from_date = datetime(year=2022, month=7, day=20)
-    to_date = datetime(year=2022, month=7, day=21)
-    bounding_box = "POLYGON((8.40470302590683 56.465968056026654,9.60221279153183 56.465968056026654,9.60221279153183 55.761573584491785,8.40470302590683 55.761573584491785,8.40470302590683 56.465968056026654))"
-    resolution = 20  # 10, 20, 40, 50, 100, 200
-    data_type = 'uint8'  # uint8 / uint16
+    from_date = datetime(year=2019, month=3, day=1)
+    to_date = datetime(year=2022, month=1, day=1)
+    bounding_box = "POLYGON((-60.00686304081232 -12.366792901186335,-50.31692163456232 -12.366792901186335,-50.31692163456232 -18.505618971723774,-60.00686304081232 -18.505618971723774,-60.00686304081232 -12.366792901186335))"
+    resolution = 10  # 10, 20, 40, 50, 100, 200
+    epsg_out = 32632  # any epsg number # for original utmzone # 326 + zone eg. 32632 (denmark)
 
     # Band options include ('rgb', 'all' or a combination of the following bands 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12')
     # It is also possible to pre calculate remote sensing indices in the form (Band1 - Band2) / (Band1 + Band2)
@@ -23,19 +24,12 @@ def example_1():
     bands = 'B4, B3, B2, B8, [B8_B4]'
 
 
-    out_folder = "C:/test/"
-    file_type = 'tif'  # tif / png, if png is chosen datatype will be set to uint8 and bands will be set to rgb
-
-
-    # For previews optimized for fast processing use the following settings: resolution = 50, data_type ='uint8' file_type = 'png'
-
-
     while from_date < to_date:
 
-        file_name = "file_" + str(from_date).split(" ")[0].replace("-", "") + "." + file_type # This can be modified to suit your needs
+        file_name = "file_" + str(from_date).split(" ")[0].replace("-", "") + ".tif"  # This can be modified to suit your needs
         start = datetime.now()
 
-        query = Query(bounding_box, str(from_date), resolution, data_type, bands, epsg_out, file_type)
+        query = Query(bounding_box, str(from_date), resolution, bands, epsg_out)
         resp = request_estimate(query)
         if resp is None: # Server unreachable / invalid request parameters
             wait_seconds = 5 # time to wait before trying again

@@ -1,5 +1,5 @@
 class Query():
-    def __init__(self, bounding_box, date, resolution, data_type, bands, epsg_out, file_type):
+    def __init__(self, bounding_box, date, resolution, bands, epsg_out):
         self.bounding_box = bounding_box
         self.date = date
         self.resolution = resolution
