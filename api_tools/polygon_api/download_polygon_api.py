@@ -11,7 +11,7 @@ def request_data(query, outpath, credentials, show_progress, filename, start):
     sys.stdout.flush()
 
     url = "https://api.clearsky.vision/api/SatelliteImages/preview/boundingbox?boundingBox=" + query.bounding_box + \
-          "&date=" + query.date + "&resolution=" + str(query.resolution) +"&epsgProjection=" + str(query.epsg_out) + "&bandNames=" + query.bands
+          "&date=" + query.date + "&resolution=" + str(query.resolution) +"&epsgProjection=" + str(query.epsg_out) + "&bandNames=" + query.bands + "&Datatype=" + query.datatype + "&FileType=" + query.filetype
 
 
     name = outpath + filename
@@ -24,7 +24,7 @@ def request_estimate(query):
 
 
     url = "https://api.clearsky.vision/api/SatelliteImages/preview/boundingbox/estimate?boundingBox=" + query.bounding_box + \
-          "&date=" + query.date + "&resolution=" + str(query.resolution) + "&bandNames=" + query.bands
+          "&date=" + query.date + "&resolution=" + str(query.resolution) + "&bandNames=" + query.bands  + "&dataType=" + query.datatype + "&fileType=" + query.filetype
 
 
     #name = outpath + filename
