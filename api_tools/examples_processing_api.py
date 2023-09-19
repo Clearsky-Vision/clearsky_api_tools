@@ -77,10 +77,14 @@ class Query():
         if geojson_path != "":
             with open(geojson_path, 'r', encoding='utf-8-sig') as file:
                 geojson_file = json.load(file)
-            polygon_geometries = [
-                feature['geometry'] for feature in geojson_file['features']
-                if feature['geometry']['type'] in ['Polygon', 'MultiPolygon']
-            ]
+
+            if geojson_file['type'] == 'FeatureCollection':
+                polygon_geometries = [
+                    feature['geometry'] for feature in geojson_file['features']
+                    if feature['geometry']['type'] in ['Polygon', 'MultiPolygon']
+                ]
+            elif geojson_file['type'] in ['Polygon', 'MultiPolygon']:
+                polygon_geometries = [geojson_file]
             if len(polygon_geometries) > 1:
                 print("warning multiple polygons/multipolygons detected, only first is used")
             self.geojson = polygon_geometries[0]
