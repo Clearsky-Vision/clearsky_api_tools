@@ -26,7 +26,7 @@ def example_1():
     geojson_path = "example_gjson.geojson"
 
 
-    resolution = 40  # 10, 20, 40, 50, 100, 200
+    resolution = 40  # 10, 20, 40, 80, 160, 320
     epsg_out = 3857  # any epsg number # for original utmzone # 326 + zone eg. 32632 (denmark)
     filetype = 'tif'  # 'tif' or 'png'
 
