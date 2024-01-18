@@ -1,26 +1,26 @@
 # Welcome ClearSKY Vision
 
-![ClearSky Vision](https://clearsky.vision/wp-content/uploads/2023/11/eueu.png "ClearSky Vision Github")
+![ClearSky Vision](https://clearsky.vision/wp-content/uploads/2024/01/github_banner.png)
 
 > **ClearSKY Vision**. The service delivers cloudless, multi-spectral Sentienl-2 (Level-2A) imagery. By harnessing a unique blend of data from multiple satellites, including Sentinel-1, Sentinel-2, Sentinel-3, and Landsat 8/9, and applying advanced deep learning techniques, we've successfully tackled the challenge of frequent cloud cover in traditional satellite images. The data product is comprised of estimations across 10 spectral bands from the Sentinel-2 MultiSpectral Instrument (MSI) Sensor. The cloudless imagery have many similarities to 'normal' Sentinel-2 and only deviate slightly to improve on the usability and accessibility of the data.
 
 ## Table of Contents
-___
-* [Getting Started](#getting-started)
-* [Python Scripts:](#python-scripts)
+* [Getting Started](#Getting-Started)
+* [Python Scripts:](#Python-Scripts)
     * Tile API 
     * Processing API 
-* [Jupyter Notebooks:](#jupyter-notebooks)
+* [Jupyter Notebooks:](#Jupyter-Notebooks)
     * Processing API
-* [Additional Resources](#additional-resources)
+* [Additional Resources](#Additional-Resources)
+* [Frequently Asked Questions](#Frequently-Asked-Questions)
 
 ## Getting Started
-___
+
 
 ### API Credentials
 All API calls requires valid credentials which for testing purposes can be acquired from eo.clearsky.vision. You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get €125 worth of credits. The credentials will be sent to the provided email straightaway. 
 
-![API KEY GIF](https://clearsky.vision/wp-content/uploads/2024/01/APIKEY_GIF.gif)
+![API KEY GIF](https://clearsky.vision/wp-content/uploads/2024/01/Github_GIF.gif)
 
 Alternatively, you can ask for access by writing to info@clearsky.vision and get in contact with a human.
 
@@ -51,24 +51,24 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~260.
 
 
 ## Python Scripts
-___
+
 * [Tile API Code Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/example_tile_api.py)
 * [Processing API Code Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/examples_processing_api.py)
 
 ## Jupyter Notebooks
-___
+
 
 * Processing API Code Example 
 
 ## Additional Resources
-___
+
 * Service Homepage (www.clearsky.vision)
 * Swagger API Docs (www.api.clearsky.vision)
 * Service Uptime (www.uptime.clearsky.vision)
 * Browse Imagery (www.eo.clearsky.vision)
 
 ## Frequently Asked Questions
-___
+
 * ***Why is the service not available in my area?***
     * The service is time-consuming and expensive to run as a small startup. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (info@clearsky.vision). All new areas start out with testing and free data sharing. You will get plenty of opportunities to test the imagery in your applications. 
 * ***What does synthetic data mean and can I trust it?***
