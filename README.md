@@ -6,13 +6,13 @@
 
 ## Table of Contents
 ___
-* Getting Started
-* Python Scripts:
+* [Getting Started](#getting-started)
+* [Python Scripts:](#python-scripts)
     * Tile API 
     * Processing API 
-* Jupyter Notebooks:
+* [Jupyter Notebooks:](#jupyter-notebooks)
     * Processing API
-* Additional Resources
+* [Additional Resources](#additional-resources)
 
 ## Getting Started
 ___
@@ -49,15 +49,11 @@ The cloudless data has been corrected with Sen2Cor for bottom-of-atmosphere dist
 
 As a rule of thumb, if your area of interest is larger than 10% of a tile (~260.2 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire (in terms of MB/s), as there is no processing happening. 
 
-### Best Practices
-* To ensure maximum coordinate precision, 
-* 
-
 
 ## Python Scripts
 ___
-* Tile API Code Example
-* Processing API Code Example
+* [Tile API Code Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/example_tile_api.py)
+* [Processing API Code Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/examples_processing_api.py)
 
 ## Jupyter Notebooks
 ___
@@ -89,8 +85,3 @@ ___
 Contact us at info@clearsky.vision for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.
 
 > Updated on 2024/01/19
-
-
-```python
-
-```
