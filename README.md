@@ -28,7 +28,7 @@ At ClearSKY Vision, we are committed to transforming the landscape of Earth obse
 
 This data source is unique due to the following features:
 * Gain access to frequent cloudless multi-spectral imagery.
-* Gain access to data from 7 satellites in one image product.
+* Leverage the capabilities of seven satellites, while focusing operations on just one.
 * No need for cloud and shadow masks as there are none.
 * Easy to use time-series data without any missing values.
 * An affordable source for up-to-date optical imagery.
@@ -84,7 +84,7 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~260.
 ## Jupyter Notebooks
 
 
-* Processing API Example 
+* [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/notebook/Processing_API_Notebook.ipynb)
 
 ## Additional Resources
 
