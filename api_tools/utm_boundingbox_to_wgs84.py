@@ -1,7 +1,7 @@
 from pyproj import Transformer
 from shapely.geometry import Polygon
 
-def pad_and_transform_bbox(bbox, epsg_code, padding=0, out_epsg=4326):
+def pad_and_transform_bbox(bbox, epsg_code, padding=0):
     """
     Pads a UTM bounding box, converts it to EPSG:4326, and constructs a WKT polygon.
 
