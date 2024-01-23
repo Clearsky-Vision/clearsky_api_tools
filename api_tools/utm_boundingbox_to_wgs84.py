@@ -24,11 +24,11 @@ def pad_and_transform_bbox(bbox, epsg_code, padding=0):
 
     # Create WKT Polygon
     polygon = Polygon([(min_x, min_y), (min_x, max_y), (max_x, max_y), (max_x, min_y), (min_x, min_y)])
-    return polygon.wkt, (min_x, min_y, max_x, max_y)
+    return polygon.wkt
 
 
 in_epsg = 32633
 #(min_x, min_y, max_x, max_y)
 bbox = (460590, 6299090, 462590, 6300090)
-wkt_str_polygon, wktbounds = pad_and_transform_bbox(bbox, in_epsg, padding=0.1)
+wkt_str_polygon = pad_and_transform_bbox(bbox, in_epsg, padding=0.1)
 
