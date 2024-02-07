@@ -16,10 +16,10 @@
     * [Data Specifications](#data-specifications)
     * [Tile vs Processing API](#tile-vs-processing-api)
 * [Python Scripts](#python-scripts)
-  * [Tile API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/example_tile_api.py)
-  * [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/examples_processing_api.py)
+  * [Tile API Example](api_tools/example_tile_api.py)
+  * [Processing API Example](api_tools/examples_processing_api.py)
 * [Jupyter Notebooks](#jupyter-notebooks)
-    * [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/notebook/Processing_API_Notebook.ipynb)
+    * [Processing API Example](notebook/Processing_API_Notebook.ipynb)
 * [Additional Resources](#additional-resources)
 * [Frequently Asked Questions](#frequently-asked-questions)
 
@@ -78,13 +78,13 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.
 
 ## Python Scripts
 
-* [Tile API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/example_tile_api.py)
-* [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/examples_processing_api.py)
+* [Tile API Example](api_tools/example_tile_api.py)
+* [Processing API Example](api_tools/examples_processing_api.py)
 
 ## Jupyter Notebooks
 
 
-* [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/notebook/Processing_API_Notebook.ipynb)
+* [Processing API Example](notebook/Processing_API_Notebook.ipynb)
 
 ## Additional Resources
 
