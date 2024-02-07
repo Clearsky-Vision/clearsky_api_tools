@@ -71,9 +71,9 @@ The API data is served in ‘int16’ and the designated value for 'no data' is 
 ### Tile vs Processing API
 
 * **Tile API:** A ClearSky Vision tile is always 2621 km2 (5120x5120 px) and it may contain no-data near shores or UTM zone transitions. A tile is returned as a Cloud Optimized GeoTIFF (COG), meaning it contains multiple resolutions that can be extracted one-by-one. The Tile API does not allow for any processing.  
-* **Processing API:** You only pay for the data you need. The Processing API can cut and merge tiles into custom bounding boxes (including single and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. It's purpose it to deliver analysis-ready data in whatever format that is required by the user. 
+* **Processing API:** You only pay for the data you need. The Processing API can cut and merge tiles into custom bounding boxes (including single and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. Its purpose is to deliver analysis-ready data in whatever format is required by the user. 
 
-As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.1 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire (in terms of MB/s), as there is no processing happening. 
+As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.1 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire as there is no processing happening, the only delay is download time. 
 
 
 ## Python Scripts
@@ -89,8 +89,8 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.
 ## Additional Resources
 
 * Service Homepage ([www.clearsky.vision](https://clearsky.vision/))
-* Swagger API Docs ([api.clearsky.vision](https://api.clearsky.vision/docs/index.html?url=/api/specification.json))
-* Service Uptime ([uptime.clearsky.vision](https://uptime.clearsky.vision/status/default))
+* Swagger API Docs ([api.clearsky.vision](https://api.clearsky.vision/))
+* Service Uptime ([uptime.clearsky.vision](https://uptime.clearsky.vision/))
 * Browse Imagery ([eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00))
 
 ![ClearSky Vision](https://clearsky.vision/wp-content/uploads/2024/01/github_banner.png)
@@ -98,13 +98,13 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.
 ## Frequently Asked Questions
 
 * ***Why is the service not available in my area?***
-    * The service is time-consuming and expensive to run as a small startup. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (info@clearsky.vision). All new areas start out with testing and free data sharing. You will get plenty of opportunities to test the imagery in your applications. 
+    * The service is time-consuming and expensive to run as a small startup, so if imagery in an area is likely to be unused it will not be generated until it is in demand. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (info@clearsky.vision). All new areas start out with testing and free data sharing. You will get plenty of opportunities to test the imagery in your applications. 
 * ***What does synthetic data mean and can I trust it?***
-    * The data available on eo.clearsky.vision is derived from deep neural networks because this is the only way to extract the necessary information available in the images. We call images derived from this process ‘synthetic’ to not mislead users about the origin of the data. This also includes natural cloud-free data from Sentinel-2, as this data is still being processed by an artificial intelligence to ensure consistency among other things. The imagery, however, is designed to mimic normal Sentinel-2 imagery minus a few undesirable traits. The imagery you will find here looks and feels like Sentinel-2. If you would like to know more about our testing methods or accuracy, feel free to reach out at info@clearsky.vision.
+    * The data available on eo.clearsky.vision is derived from deep neural networks. This is the only way to extract the necessary information available in the images. We call images derived from this process ‘synthetic’ as to not mislead users about the origin of the data. This also includes natural cloud-free data from Sentinel-2, as this data is still being processed by an artificial intelligence to ensure consistency among other things. The imagery, however, is designed to mimic normal Sentinel-2 imagery minus a few undesirable traits. The imagery you will find here looks and feels like Sentinel-2, and can be swapped in-place in pipelines already using the original Sentinel-2 imagery. If you would like to know more about our testing methods or accuracy, feel free to reach out at info@clearsky.vision.
 * ***Is there any difference between today's data and historical data?***
-    * No, all data has been produced in the same way. This is to ensure consistency throughout our service. However, this also means historical data is produced without any future insights and it’s only backward-looking. It will not extrapolate into what we know it will become because it will not see future data even if we do have it available.
+    * No, all data has been produced in the same way. This is to ensure consistency throughout our service. However, this also means historical data is produced without any future insights and it’s only backward-looking. It will not interpolate between the date and what we know it will become in the future because it will not ingest future data even if it is available. We only extrapolate given historical data using multiple satellites what a likely clean image looks like.
 * ***Can I access water imagery through this service?***
-    * No. This is developed for land-based monitoring and all open water bodies are removed after the images have been created. We do not store SAR data for open seas and it’s not recommended to use any unremoved water imagery that you might find on the platform. You can find lakes consistently in our imagery, however, all water data is considerably lower quality than our land-based imagery. The recommended use of this platform (and all imagery available) is for continuous monitoring of land-based areas of interest. It has been developed for vegetation monitoring. 
+    * No. This is developed for land-based monitoring and most of open water bodies are removed after the images have been created. We do not store SAR data for open seas and it’s not recommended to use any unremoved water imagery that you might find on the platform. You can find lakes consistently in our imagery, however, all water data is considerably lower quality than our land-based imagery. The recommended use of this platform (and all imagery available) is for continuous monitoring of land-based areas of interest. It has been developed with vegetation monitoring in mind. 
 * ***I'm receiving error code 401, what does that mean?***
     * It means unauthorized access to our services which is often due to missing or incorrect API credentials. 
 * ***I'm receiving error code 1002, what does that mean?***
@@ -114,6 +114,6 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.
 
 
 
-> Updated on 2024/01/19
+> Updated on 2024/02/07
 
 Contact us at info@clearsky.vision for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.
