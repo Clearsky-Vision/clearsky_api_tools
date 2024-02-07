@@ -70,10 +70,10 @@ The API data is served in ‘int16’ and the designated value for 'no data' is 
 
 ### Tile vs Processing API
 
-* **Tile API:** A ClearSky Vision tile is always 2602 km2 (5120x5120 px) and it may contain no-data near shores or UTM zone transitions. A tile is returned as a Cloud Optimized GeoTIFF (COG), meaning it contains multiple resolutions that can be extracted one-by-one. The Tile API does not allow for any processing.  
+* **Tile API:** A ClearSky Vision tile is always 2621 km2 (5120x5120 px) and it may contain no-data near shores or UTM zone transitions. A tile is returned as a Cloud Optimized GeoTIFF (COG), meaning it contains multiple resolutions that can be extracted one-by-one. The Tile API does not allow for any processing.  
 * **Processing API:** You only pay for the data you need. The Processing API can cut and merge tiles into custom bounding boxes (including single and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. It's purpose it to deliver analysis-ready data in whatever format that is required by the user. 
 
-As a rule of thumb, if your area of interest is larger than 10% of a tile (~260.2 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire (in terms of MB/s), as there is no processing happening. 
+As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.1 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire (in terms of MB/s), as there is no processing happening. 
 
 
 ## Python Scripts
