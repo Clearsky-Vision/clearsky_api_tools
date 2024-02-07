@@ -9,19 +9,19 @@
 **ClearSKY Vision**. The service delivers cloudless, multi-spectral Sentinel-2 (Level-2A) imagery. By harnessing a unique blend of data from multiple satellites, including Sentinel-1, Sentinel-2, Sentinel-3, and Landsat 8/9, and applying advanced deep learning techniques, we've successfully tackled the challenge of frequent cloud cover in traditional satellite images. The data product is comprised of estimations across 10 spectral bands from the [Sentinel-2 MultiSpectral Instrument (MSI)](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-2-msi/msi-instrument) Sensor. The cloudless imagery have many similarities to 'normal' Sentinel-2 and only deviate slightly to improve on the usability and accessibility of the data. 
 
 ## Table of Contents
-* [Why ClearSky Vision](#Why-ClearSky-Vision)
-* [Getting Started](#Getting-Started)
-    * Installation Instructions
-    * API Credentials
-    * Data Specifications
-    * Tile vs. Processing API
-* [Python Scripts](#Python-Scripts)
-    * Tile API Example
-    * Processing API Example
-* [Jupyter Notebooks](#Jupyter-Notebooks)
-    * Processing API Example
-* [Additional Resources](#Additional-Resources)
-* [Frequently Asked Questions](#Frequently-Asked-Questions)
+* [Why ClearSky Vision](#why-clearsky-vision)
+* [Getting Started](#getting-started)
+    * [Installation Instructions](#installation-instructions)
+    * [API Credentials](#api-credentials)
+    * [Data Specifications](#data-specifications)
+    * [Tile vs Processing API](#tile-vs-processing-api)
+* [Python Scripts](#python-scripts)
+  * [Tile API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/example_tile_api.py)
+  * [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/api_tools/examples_processing_api.py)
+* [Jupyter Notebooks](#jupyter-notebooks)
+    * [Processing API Example](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/notebook/Processing_API_Notebook.ipynb)
+* [Additional Resources](#additional-resources)
+* [Frequently Asked Questions](#frequently-asked-questions)
 
 ## Why ClearSky Vision
 At ClearSKY Vision, we are committed to transforming the landscape of Earth observation. Our mission is to revolutionize the accessibility and usability of satellite imagery, making it more relevant, immediate, and actionable. Our goal is to empower researchers, innovators, and decision-makers with precise and reliable optical imagery, unlocking new possibilities in environmental monitoring, resource management, and global awareness.
@@ -68,7 +68,7 @@ The cloudless data has been corrected with Sen2Cor for bottom-of-atmosphere dist
 The API data is served in ‘int16’ and the designated value for 'no data' is -32768. The reflectance scaling factor for  spectral bands is 10000, while for indices the values should be divided by 32767. All indices precomputed on our servers range from -1 to 1, if larger ranges are needed, we recommend that the user downloads the needed bands and then do the index calculation.
 
 
-### Tile vs. Processing API?
+### Tile vs Processing API
 
 * **Tile API:** A ClearSky Vision tile is always 2602 km2 (5120x5120 px) and it may contain no-data near shores or UTM zone transitions. A tile is returned as a Cloud Optimized GeoTIFF (COG), meaning it contains multiple resolutions that can be extracted one-by-one. The Tile API does not allow for any processing.  
 * **Processing API:** You only pay for the data you need. The Processing API can cut and merge tiles into custom bounding boxes (including single and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. It's purpose it to deliver analysis-ready data in whatever format that is required by the user. 
