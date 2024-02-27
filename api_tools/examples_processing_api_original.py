@@ -11,9 +11,9 @@ import json
 # download all files in search to data_path_out
 def example_1():
 
-    credentials = User(api_key="XXXXXXXXXXXXXXXXXXXXXX")
+    credentials = User(api_key="xxxxxxxxxxxxxxxxxxx")
     show_progress = True # progress bar for each download
-    out_folder = "destination_out"
+    out_folder = "destination_path"
 
     from_date = datetime(year=2023, month=11, day=1)
     to_date = datetime(year=2023, month=11, day=10)
@@ -31,38 +31,32 @@ def example_1():
     pixel_selection_mode = 'intersect' # Intersect or Contained
     data_type = 'int16' # int16 or uint8
     utm_data_selection_mode = 'combined_utm' # single_utm_fully_covered, single_utm, combined_utm
-    utm_grid_force_pixel_resolution_size = False # resample pixels to epsg_out grid ensuring resolution
 
 
-    # Band options include ('rgb', 'all' or a combination of the following bands 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12')
-    # It is also possible to pre-compute remote sensing indices in the form (Band1 - Band2) / (Band1 + Band2)
-    # for instance NDVI would be written as [B8_B4] and will be calculated as (B8 - B4) / (B8 + B4)
-    bands = 'all'#'B2, B3, B4,[B8_B4]'
-
-    date_setting = datetime(year=2023,month=3, day=2)# used to avoid requesting data on off days
+    # Band options include ('original' for all bands or a combination of the following bands 'B2_original', 'B3_original', 'B4_original', 'B5_original', 'B6_original', 'B7_original', 'B8_original', 'B8A_original', 'B11_original', 'B12_original')
+    bands = 'B4_original, B3_original, B2_original'
 
     while from_date < to_date:
         
-        if (from_date - date_setting).days % 2 == 0 :
-            file_name = "Sentinel2ClearSky_" + str(from_date).split(" ")[0].replace("-", "") + ".tif"  # Modify to suit your needs
-            start = datetime.now()
+        file_name = "Sentinel2_original_" + str(from_date).split(" ")[0].replace("-", "") + ".tif"  # Modify to suit your needs
+        start = datetime.now()
 
-            query = Query(bounding_box, str(from_date), resolution, bands, epsg_out, filetype, geojson_path, pixel_selection_mode, data_type, utm_data_selection_mode, utm_grid_force_pixel_resolution_size)
+        query = Query(bounding_box, str(from_date), resolution, bands, epsg_out, filetype, geojson_path, pixel_selection_mode, data_type, utm_data_selection_mode)
 
-            resp = request_estimate(query)
-            if resp is None: # Server unreachable / invalid request parameters
-                wait_seconds = 5 # time to wait before trying again
-                print("Retrying in " + str(wait_seconds) + " seconds")
-                time.sleep(wait_seconds)
-                continue
-            print("Job credit cost: " + str(resp['Data']['CreditEstimate']) + " credits" + ", Job processing time ~ " + str(resp['Data']['FastTimeEstimateSeconds']) + " to " + str(resp['Data']['SlowTimeEstimateSeconds']) + " Seconds")
-            print("Job output area: " + str(resp['Data']['AreaEstimateKm2']) + "Km2" + ", Estimated file size:" + str(resp['Data']['FileSizeEstimateMB']) + "mb")
+        resp = request_estimate(query)
+        if resp is None: # Server unreachable / invalid request parameters
+            wait_seconds = 5 # time to wait before trying again
+            print("Retrying in " + str(wait_seconds) + " seconds")
+            time.sleep(wait_seconds)
+            continue
+        print("Job credit cost: " + str(resp['Data']['CreditEstimate']) + " credits" + ", Job processing time ~ " + str(resp['Data']['FastTimeEstimateSeconds']) + " to " + str(resp['Data']['SlowTimeEstimateSeconds']) + " Seconds")
+        print("Job output area: " + str(resp['Data']['AreaEstimateKm2']) + "Km2" + ", Estimated file size:" + str(resp['Data']['FileSizeEstimateMB']) + "mb")
 
-            new_file_path = request_data(query, out_folder, credentials, show_progress, file_name, start)
+        new_file_path = request_data(query, out_folder, credentials, show_progress, file_name, start)
 
-            # if request failed
-            if new_file_path[0] is None:
-                print("request failed")
+        # if request failed
+        if new_file_path[0] is None:
+            print("request failed")
         from_date += timedelta(days=1)
 
     print("done")
@@ -71,7 +65,7 @@ def example_1():
 
 
 class Query():
-    def __init__(self, bounding_box, date, resolution, bands, epsg_out, filetype, geojson_path, pixel_selection_mode, data_type, utm_data_selection_mode, utm_grid_force_pixel_resolution_size):
+    def __init__(self, bounding_box, date, resolution, bands, epsg_out, filetype, geojson_path, pixel_selection_mode, data_type, utm_data_selection_mode):
         self.bounding_box = bounding_box
         self.date = date.split(" ")[0] +"T00:00:00Z"
         self.resolution = resolution
@@ -81,7 +75,6 @@ class Query():
         self.filetype = filetype
         self.pixel_selection_mode = pixel_selection_mode
         self.utm_data_selection_mode = utm_data_selection_mode
-        self.utm_grid_force_pixel_resolution_size = utm_grid_force_pixel_resolution_size
 
 
 
@@ -113,7 +106,7 @@ def request_data(query, outpath, credentials, show_progress, filename, start):
     print("Server is now processing your request, please wait")
     sys.stdout.flush()
 
-    url = "https://api.clearsky.vision/api/SatelliteImages/process/composite"
+    url = "https://api.clearsky.vision/api/SatelliteProducts/process/composite/original"
 
 
     body = {"Date": query.date,
@@ -123,7 +116,6 @@ def request_data(query, outpath, credentials, show_progress, filename, start):
             "PixelSelectionMode": query.pixel_selection_mode,
             "DataType": query.datatype,
             "UtmDataSelectionMode": query.utm_data_selection_mode,
-            "UtmGridForcePixelResolutionSize": query.utm_grid_force_pixel_resolution_size,
             "Bandnames": query.bands}
     
     if query.geojson is None:
@@ -144,7 +136,7 @@ def request_data(query, outpath, credentials, show_progress, filename, start):
 def request_estimate(query):
 
 
-    url = "https://api.clearsky.vision/api/SatelliteImages/process/composite/estimate"
+    url = "https://api.clearsky.vision/api/SatelliteProducts/process/composite/original/estimate"
 
     body = {
             "Date": query.date,
