@@ -72,6 +72,7 @@ Additional metadata tags have been integrated into GeoTIFF files retrieved throu
 - "IMAGE_DATE": Represents the date of the image, formatted as "yyyymmdd".
 - "MODEL_VERSION": Indicates the version of the model used for prediction. This tag helps in monitoring significant updates made to the data.
 - "IMAGE_VERSION": Notifies users of any modifications to the image. If a tile is regenerated for any reason, this number increments by one.
+
 When a request overlaps multiple tiles, the "IMAGE_VERSION" and "MODEL_VERSION" tags will list values for each intersecting tile, separated by commas. The order of these values corresponds to the internal positioning of the tiles within our data storage, not by numerical sorting. For instance, if a request intersects four tiles, where three use model version 13 and the last uses model version 15, the "MODEL_VERSION" tag might display as "13,15,13,13". This arrangement ensures that any change in the data, such as a change in version from "13,15,13,13" to "13,15,13,15", indicates that the last tile in our internal sorting has been updated to version 15.
 
 
