@@ -67,6 +67,10 @@ The cloudless data has been corrected with Sen2Cor for bottom-of-atmosphere dist
 
 The API data is served in ‘int16’ and the designated value for 'no data' is -32768. The reflectance scaling factor for  spectral bands is 10000, while for indices the values should be divided by 32767. All indices precomputed on our servers range from -1 to 1, if larger ranges are needed, we recommend that the user downloads the needed bands and then do the index calculation.
 
+Additional metadata tags has been added to geotiff files retrieved using the processing api:
+- "IMAGE_DATE" - The date that the image represents in the format "yyyymmdd"
+- "MODEL_VERSION" - The id of the model used for the prediction. This can be used to track when new larger changes have been made to the data.
+- "IMAGE_VERSION" - This tag allows the user to see if any changes have been made. Whenever a tile is reproduced for whatever reason, this number will increment by one.
 
 ### Tile vs Processing API
 
