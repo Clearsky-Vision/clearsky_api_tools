@@ -67,10 +67,13 @@ The cloudless data has been corrected with Sen2Cor for bottom-of-atmosphere dist
 
 The API data is served in ‘int16’ and the designated value for 'no data' is -32768. The reflectance scaling factor for  spectral bands is 10000, while for indices the values should be divided by 32767. All indices precomputed on our servers range from -1 to 1, if larger ranges are needed, we recommend that the user downloads the needed bands and then do the index calculation.
 
-Additional metadata tags has been added to geotiff files retrieved using the processing api:
-- "IMAGE_DATE" - The date that the image represents in the format "yyyymmdd"
-- "MODEL_VERSION" - The id of the model used for the prediction. This can be used to track when new larger changes have been made to the data.
-- "IMAGE_VERSION" - This tag allows the user to see if any changes have been made. Whenever a tile is reproduced for whatever reason, this number will increment by one.
+Additional metadata tags have been integrated into GeoTIFF files retrieved through the Processing API:
+
+- "IMAGE_DATE": Represents the date of the image, formatted as "yyyymmdd".
+- "MODEL_VERSION": Indicates the version of the model used for prediction. This tag helps in monitoring significant updates made to the data.
+- "IMAGE_VERSION": Notifies users of any modifications to the image. If a tile is regenerated for any reason, this number increments by one.
+When a request overlaps multiple tiles, the "IMAGE_VERSION" and "MODEL_VERSION" tags will list values for each intersecting tile, separated by commas. The order of these values corresponds to the internal positioning of the tiles within our data storage, not by numerical sorting. For instance, if a request intersects four tiles, where three use model version 13 and the last uses model version 15, the "MODEL_VERSION" tag might display as "13,15,13,13". This arrangement ensures that any change in the data, such as a change in version from "13,15,13,13" to "13,15,13,15", indicates that the last tile in our internal sorting has been updated to version 15.
+
 
 ### Tile vs Processing API
 
