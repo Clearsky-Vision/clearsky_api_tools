@@ -28,7 +28,7 @@ def example_1():
             print(str(search_results))
         else:
             download_all(search_results, data_path_out, credentials, show_progress)
-            from_date += timedelta(days=1)
+        from_date += timedelta(days=1)
 
     print("done")
 
