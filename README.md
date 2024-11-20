@@ -15,6 +15,16 @@
     * [API Credentials](#api-credentials)
     * [Data Specifications](#data-specifications)
     * [Tile vs Processing API](#tile-vs-processing-api)
+* [Key Features](#key-features)
+    * [Importing Libraries](#importing-libraries)
+    * [Acquiring User Credentials](#acquiring-user-credentials)
+    * [Functions for 'Data Availability'](#functions-for-data-availability)
+    * [Requesting 'Data Availability'](#requesting-data-availability)
+    * [Functions for Estimating Credit Cost and Area](#functions-for-estimating-credit-cost-and-area)
+    * [Requesting Estimated Credit Costs and Area](#requesting-estimated-credit-costs-and-area)
+    * [Functions for Downloading Imagery](#functions-for-downloading-imagery)
+    * [Downloading a Single Satellite Image](#downloading-a-single-satellite-image)
+    * [Visualizing Acquired Satellite Image](#visualizing-acquired-satellite-image)
 * [Python Scripts](#python-scripts)
   * [Tile API Example](api_tools/example_tile_api.py)
   * [Processing API Example](api_tools/examples_processing_api.py)
@@ -84,31 +94,13 @@ When a request overlaps multiple tiles, the "IMAGE_VERSION" and "MODEL_VERSION" 
 As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.1 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire as there is no processing happening, the only delay is download time. 
 
 
-# Key Features:
+## Key Features:
 1. **Check data availability** in your Area of Interest (AOI).
 2. **Estimate area and credit costs** for the requested data.
 3. **Download cloud-free Sentinel-2 imagery**.
 4. **Visualize acquired satellite imagery** for further analysis.
 
-Feel free to contact **info@clearsky.vision** for any questions or issues.
-
----
-
-## Table of Contents
-
-- [Importing Libraries](#importing-libraries)
-- [Acquiring User Credentials](#acquiring-user-credentials)
-- [Functions for 'Data Availability'](#functions-for-data-availability)
-- [Requesting 'Data Availability'](#requesting-data-availability)
-- [Functions for Estimating Credit Cost and Area](#functions-for-estimating-credit-cost-and-area)
-- [Requesting Estimated Credit Costs and Area](#requesting-estimated-credit-costs-and-area)
-- [Functions for Downloading Imagery](#functions-for-downloading-imagery)
-- [Downloading a Single Satellite Image](#downloading-a-single-satellite-image)
-- [Visualizing Acquired Satellite Image](#visualizing-acquired-satellite-image)
-
----
-
-## Importing Libraries
+### Importing Libraries
 
 Install the necessary Python libraries for running the examples:
 
@@ -118,7 +110,7 @@ pip install requests tqdm
 
 ---
 
-## Acquiring User Credentials
+### Acquiring User Credentials
 
 Request trial API credentials from **[ClearSky Vision](https://eo.clearsky.vision)** by clicking "GET API KEY". You will receive €125 worth of credits immediately via email. Alternatively, contact **info@clearsky.vision** for manual access.
 
@@ -132,7 +124,7 @@ credentials = User(api_key="XXXXXXXXXXXXXXXXXXXXXX")
 
 ---
 
-## Functions for 'Data Availability'
+### Functions for 'Data Availability'
 
 To automate satellite data acquisition, it’s useful to check if the imagery for today is available. This avoids surprises, especially for large AOIs that may cross multiple tiles. The API call is free but requires an API key.
 
@@ -144,7 +136,7 @@ Refer to the code from **`/api_tools/example_api.py`** (lines 30-60).
 
 ---
 
-## Requesting 'Data Availability'
+### Requesting 'Data Availability'
 
 The 'Data Availability' endpoint provides four key categories:
 - **IntersectedActiveZones**: `True` if tiles intersecting the AOI are found.
@@ -160,7 +152,7 @@ Refer to **`/api_tools/example_api.py`** (lines 70-80).
 
 ---
 
-## Requesting Estimated Credit Costs and Area
+### Requesting Estimated Credit Costs and Area
 
 You can estimate the credit cost and area size before downloading imagery. The endpoint also provides processing time and file size. This call is free and requires the same parameters as a download request.
 
@@ -172,7 +164,7 @@ Refer to **`/api_tools/example_api.py`** (lines 90-100).
 
 ---
 
-## Downloading a Single Satellite Image
+### Downloading a Single Satellite Image
 
 The `PixelSelectionMode` parameter controls which pixels are included:
 - **Intersect**: Includes all pixels that intersect the bounding box (default).
@@ -186,7 +178,7 @@ Refer to **`/api_tools/example_api.py`** (lines 110-140).
 
 ---
 
-## Visualizing Acquired Satellite Image
+### Visualizing Acquired Satellite Image
 
 The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS) to visualize it. For a true-color image, select the B4, B3, and B2 bands (Red, Green, and Blue).
 
