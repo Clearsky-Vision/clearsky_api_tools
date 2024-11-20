@@ -48,6 +48,7 @@ This data source is unique due to the following features:
 
 ## Getting Started
 
+For further details or support, contact **info@clearsky.vision**.
 
 ### Installation Instructions
 This project does not require any special installation procedures. It can be used or integrated into your existing workflow as is. To get started, simply clone or download the repository to your local machine.
@@ -108,8 +109,6 @@ Install the necessary Python libraries for running the examples:
 pip install requests tqdm
 ```
 
----
-
 ### Acquiring User Credentials
 
 Request trial API credentials from **[ClearSky Vision](https://eo.clearsky.vision)** by clicking "GET API KEY". You will receive €125 worth of credits immediately via email. Alternatively, contact **info@clearsky.vision** for manual access.
@@ -122,8 +121,6 @@ class User:
 credentials = User(api_key="XXXXXXXXXXXXXXXXXXXXXX")
 ```
 
----
-
 ### Functions for 'Data Availability'
 
 To automate satellite data acquisition, it’s useful to check if the imagery for today is available. This avoids surprises, especially for large AOIs that may cross multiple tiles. The API call is free but requires an API key.
@@ -133,8 +130,6 @@ Refer to the code from **`/api_tools/example_api.py`** (lines 30-60).
 ```python
 <example code from file>
 ```
-
----
 
 ### Requesting 'Data Availability'
 
@@ -150,8 +145,6 @@ Refer to **`/api_tools/example_api.py`** (lines 70-80).
 <example code from file>
 ```
 
----
-
 ### Requesting Estimated Credit Costs and Area
 
 You can estimate the credit cost and area size before downloading imagery. The endpoint also provides processing time and file size. This call is free and requires the same parameters as a download request.
@@ -161,8 +154,6 @@ Refer to **`/api_tools/example_api.py`** (lines 90-100).
 ```python
 <example code from file>
 ```
-
----
 
 ### Downloading a Single Satellite Image
 
@@ -176,15 +167,11 @@ Refer to **`/api_tools/example_api.py`** (lines 110-140).
 <example code from file>
 ```
 
----
-
 ### Visualizing Acquired Satellite Image
 
 The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS) to visualize it. For a true-color image, select the B4, B3, and B2 bands (Red, Green, and Blue).
 
 ---
-
-For further details or support, contact **info@clearsky.vision**.
 
 ## Python Scripts
 
