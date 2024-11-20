@@ -186,7 +186,7 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS
 ## Additional Resources
 
 * Service Homepage ([www.clearsky.vision](https://clearsky.vision/))
-* Service Documentation ([api.clearsky.vision](https://clearsky.vision/docs))
+* Service Documentation ([www.clearsky.vision/docs](https://clearsky.vision/docs))
 * API Endpoint Documentation ([api.clearsky.vision](https://api.clearsky.vision/))
 * Service Uptime ([uptime.clearsky.vision](https://uptime.clearsky.vision/))
 * Browse Imagery ([eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00))
