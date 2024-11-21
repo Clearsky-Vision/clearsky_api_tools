@@ -19,7 +19,7 @@ class ServiceResult(BaseModel, Generic[T]):
 class ServiceResultError(BaseModel):
     Succeeded: bool
     Error: ErrorModel
-    Data: Optional[Dict]
+    Data: Optional[Dict[str, str]]
 
 
 class GeoJsonModel(BaseModel):
@@ -51,7 +51,7 @@ class ApiKeyData(BaseModel):
     MaxTotalBands: int
 
 
-class ApiKeyInfoQueryResponse(ServiceResult[ApiKeyData]):
+class ApiKeyInfoQueryResponseDto(ServiceResult[ApiKeyData]):
     pass
 
 
@@ -60,7 +60,7 @@ class ApiKeyInfoQueryResponse(ServiceResult[ApiKeyData]):
 # --------------------------------------------------
 
 
-class SearchQueryDto(BaseModel):
+class SearchAvailableImageryQueryDto(BaseModel):
     Wkt: Optional[str]
     GeoJson: Optional[GeoJsonModel]
     From: Optional[date]
@@ -91,7 +91,7 @@ class SearchAvailableImageryData(BaseModel):
     ModelImageDates: List[ModelImageDatesModel]
 
 
-class SearchAvailableImageryQueryResponse(ServiceResult[SearchAvailableImageryData]):
+class SearchAvailableImageryQueryResponseDto(ServiceResult[SearchAvailableImageryData]):
     pass
 
 
@@ -125,7 +125,7 @@ class ProcessCompositeEstimateData(BaseModel):
     CreditEstimate: int
 
 
-class ProcessCompositeEstimateQueryResponse(ServiceResult[ProcessCompositeEstimateData]):
+class ProcessCompositeEstimateQueryResponseDto(ServiceResult[ProcessCompositeEstimateData]):
     pass
 
 
@@ -142,7 +142,7 @@ class ProcessCompositeCommandDto(ProcessCompositeEstimateQueryDto):
     UtmGridForcePixelResolutionSize: bool  #
 
 
-class ProcessCompositeErrorResponse(ServiceResultError):
+class ProcessCompositeErrorResponseDto(ServiceResultError):
     pass
 
 
@@ -165,7 +165,7 @@ class TaskingModelsData(BaseModel):
     TaskingModels: List[TaskingModelsModel]
 
 
-class TaskingModelsQueryResponse(ServiceResult[TaskingModelsData]):
+class TaskingModelsQueryResponseDto(ServiceResult[TaskingModelsData]):
     pass
 
 
@@ -174,7 +174,7 @@ class TaskingModelsQueryResponse(ServiceResult[TaskingModelsData]):
 # -------------------------------------------------
 
 
-class TaskingOrderDto(BaseModel):
+class TaskOrderDto(BaseModel):
     TaskOrderGuid: str
     BillingCycle: str  # Monthly or Yearly
     OrderingProcessStatus: str  # check api documentation for available options
@@ -192,10 +192,10 @@ class TaskingOrderDto(BaseModel):
 
 
 class TaskingOrdersData(BaseModel):
-    TaskOrders: List[TaskingOrderDto]
+    TaskOrders: List[TaskOrderDto]
 
 
-class TaskingOrdersQueryResponse(ServiceResult[TaskingOrdersData]):
+class TaskingOrdersQueryResponseDto(ServiceResult[TaskingOrdersData]):
     pass
 
 
@@ -252,11 +252,11 @@ class TaskingOrderEstimateQueryResponseData(BaseModel):
     RecurringImageDates: List[date]
 
 
-class TaskingOrderEstimateQueryResponse(ServiceResult[TaskingOrderEstimateQueryResponseData]):
+class TaskingOrderEstimateQueryResponseDto(ServiceResult[TaskingOrderEstimateQueryResponseData]):
     pass
 
 
-class TaskingOrderCreateCommandResponse(ServiceResult[TaskingOrderDto]):
+class TaskingOrderCreateCommandResponseDto(ServiceResult[TaskOrderDto]):
     pass
 
 
@@ -289,14 +289,5 @@ class TaskingTileSearchQueryResponseData(BaseModel):
     Tiles: List[TaskingTileDto]
 
 
-class TaskingTileSearchQueryResponse(ServiceResult[TaskingTileSearchQueryResponseData]):
-    pass
-
-
-# -------------------------------------------------
-# Tasking Cancel Order Command Models
-# -------------------------------------------------
-
-
-class TaskingCancelOrderCommandResponse(ServiceResultError):
+class TaskingTileSearchQueryResponseDto(ServiceResult[TaskingTileSearchQueryResponseData]):
     pass

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 import requests
 import cgi
 import os
@@ -20,43 +20,48 @@ class ClearSkyVisionAPI:
         self.api_key = api_key
         self.headers = {"x-api-key": self.api_key}
 
-    def get_api_key_info(self) -> models.ApiKeyInfoResponse:
+    def _extract_filename(self, response) -> Optional[str]:
+        """
+        Helper method to extract filename from the response headers.
+        """
+        content_disposition = response.headers.get("content-disposition")
+        if content_disposition:
+            _, params = cgi.parse_header(content_disposition)
+            return params.get("filename")
+        return None
+
+    def get_api_key_info(self) -> models.ApiKeyInfoQueryResponseDto:
         """
         Get API Key Information.
         """
-        url = f"{self.BASE_URL}/api/ApiKey/GetApiKeyInfo"
+        url = f"{self.BASE_URL}/api/apikey/info"
         response = requests.get(url, headers=self.headers)
-        response.raise_for_status()
-        return models.ApiKeyInfoResponse(**response.json())
+        return models.ApiKeyInfoQueryResponseDto(**response.json())
 
-    def search_available_imagery(
-        self, query: models.SearchQueryDto
-    ) -> models.SearchAvailableImageryResponse:
+    def search_available_imagery(self, query: models.SearchAvailableImageryQueryDto) -> models.SearchAvailableImageryQueryResponseDto:
         """
-        Endpoint 2: Search Available Imagery.
+        Search Available Imagery.
         """
-        url = f"{self.BASE_URL}/api/SatelliteImages/SearchAvailableImagery"
+        url = f"{self.BASE_URL}/api/satelliteimages/search/available"
         response = requests.post(url, headers=self.headers, json=query.dict())
-        response.raise_for_status()
-        return models.SearchAvailableImageryResponse(**response.json())
+        return models.SearchAvailableImageryQueryResponseDto(**response.json())
 
-    def get_estimate_process_composite(
-        self, query: models.ProcessCompositeEstimateQueryDto
-    ) -> models.ProcessCompositeEstimateResponse:
+    def retrieve_estimate_for_composite_of_satellite_imagery(self, query: models.ProcessCompositeEstimateQueryDto) -> models.ProcessCompositeEstimateQueryResponseDto:
         """
-        Endpoint 3: Get Estimate for Processing Composite Satellite Imagery.
+        Get Estimate for Processing Composite Satellite Imagery.
         """
-        url = f"{self.BASE_URL}/api/SatelliteImages/GetEstimateProcessCompositeSatelliteImagery"
+        url = f"{self.BASE_URL}/api/satelliteimages/process/composite/estimate"
         response = requests.post(url, headers=self.headers, json=query.dict())
-        response.raise_for_status()
-        return models.ProcessCompositeEstimateResponse(**response.json())
+        return models.ProcessCompositeEstimateQueryResponseDto(**response.json())
 
-    def process_composite_satellite_imagery(
+    def retrieve_composite_of_satellite_imagery(
         self, directory_to_save_file: str, command: models.ProcessCompositeCommandDto
-    ) -> str:
+    ) -> Union[str, models.ProcessCompositeErrorResponseDto]:
         """
         Process Composite Satellite Imagery.
-        Downloads the imagery file and returns the path to the saved file.
+
+        If requests succeeds, it returns the path to the saved file.
+        If it fails, the error response is returned
         """
 
         if not directory_to_save_file.endswith("/"):
@@ -64,11 +69,11 @@ class ClearSkyVisionAPI:
 
         os.makedirs(directory_to_save_file, exist_ok=True)
 
-        url = f"{self.BASE_URL}/api/SatelliteImages/ProcessCompositeSatelliteImagery"
-        response = requests.post(
-            url, headers=self.headers, json=command.dict(), stream=True
-        )
-        response.raise_for_status()
+        url = f"{self.BASE_URL}/api/satelliteimages/process/composite"
+        response = requests.post(url, headers=self.headers, json=command.dict(), stream=True)
+
+        if response.status_code != 200:
+            return models.ProcessCompositeErrorResponseDto(**response.json())
 
         filename = self._extract_filename(response)
         if not filename:
@@ -82,12 +87,42 @@ class ClearSkyVisionAPI:
 
         return file_path
 
-    def _extract_filename(self, response) -> Optional[str]:
+    def get_tasking_models(self) -> models.TaskingModelsQueryResponseDto:
         """
-        Helper method to extract filename from the response headers.
+        Get Models Available for Tasking.
         """
-        content_disposition = response.headers.get("content-disposition")
-        if content_disposition:
-            _, params = cgi.parse_header(content_disposition)
-            return params.get("filename")
-        return None
+        url = f"{self.BASE_URL}/api/tasking/models"
+        response = requests.post(url, headers=self.headers)
+
+        return models.TaskingModelsQueryResponseDto(**response.json())
+
+    def get_tasking_orders(self, recurring_only: bool) -> models.TaskingOrdersQueryResponseDto:
+        """
+        Get Tasking Orders.
+
+        recurring_only: only retrieve recurring taskorders
+        """
+        url = f"{self.BASE_URL}/api/tasking/orders?recurringOnly={recurring_only}"
+        response = requests.post(url, headers=self.headers)
+
+        return models.TaskingOrdersQueryResponseDto(**response.json())
+
+    def search_orderable_tiles(self, query: models.TaskingTileSearchQueryDto) -> models.TaskingTileSearchQueryResponseDto:
+        """
+        Search tiles available for Tasking Orders.
+        """
+        url = f"{self.BASE_URL}/api/tasking/search/tiles"
+        response = requests.post(url, headers=self.headers, json=query.dict())
+
+        return models.TaskingTileSearchQueryResponseDto(**response.json())
+
+    def cancel_recurring_order(self, taskorder_guid: str) -> bool:
+        """
+        Cancel Recurring Tasking Order.
+
+        taskorder_guid: Guid identifying the Tasking Order
+        """
+        url = f"{self.BASE_URL}/api/tasking/orders/cancel?taskOrderGuid={taskorder_guid}"
+        response = requests.delete(url, headers=self.headers)
+
+        return response.status_code != 200
