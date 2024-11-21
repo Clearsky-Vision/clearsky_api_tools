@@ -1,5 +1,5 @@
 import models
-from services import ClearSkyVisionAPI
+from api_service import ClearSkyVisionAPI
 
 
 def main():

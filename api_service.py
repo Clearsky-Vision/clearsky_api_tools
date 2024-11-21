@@ -1,3 +1,7 @@
+"""
+Contains Service implementing the capabilities of the ClearSky Vision API
+"""
+
 from typing import Optional, Union
 import requests
 import cgi

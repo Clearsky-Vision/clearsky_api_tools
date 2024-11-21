@@ -1,3 +1,7 @@
+"""
+Collection of Request and Response models used by the ClearSky Vision API
+"""
+
 from typing import Dict, Generic, List, Optional, TypeVar, Union
 from pydantic import BaseModel, root_validator
 from datetime import date
