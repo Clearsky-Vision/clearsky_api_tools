@@ -36,6 +36,10 @@ class ClearSkyVisionAPI:
         """
         url = f"{self.BASE_URL}/api/apikey/info"
         response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
         return models.ApiKeyInfoQueryResponseDto(**response.json())
 
     def search_available_imagery(self, query: models.SearchAvailableImageryQueryDto) -> models.SearchAvailableImageryQueryResponseDto:
@@ -44,6 +48,10 @@ class ClearSkyVisionAPI:
         """
         url = f"{self.BASE_URL}/api/satelliteimages/search/available"
         response = requests.post(url, headers=self.headers, json=query.dict())
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
         return models.SearchAvailableImageryQueryResponseDto(**response.json())
 
     def retrieve_estimate_for_composite_of_satellite_imagery(self, query: models.ProcessCompositeEstimateQueryDto) -> models.ProcessCompositeEstimateQueryResponseDto:
@@ -52,6 +60,10 @@ class ClearSkyVisionAPI:
         """
         url = f"{self.BASE_URL}/api/satelliteimages/process/composite/estimate"
         response = requests.post(url, headers=self.headers, json=query.dict())
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
         return models.ProcessCompositeEstimateQueryResponseDto(**response.json())
 
     def retrieve_composite_of_satellite_imagery(
@@ -71,6 +83,9 @@ class ClearSkyVisionAPI:
 
         url = f"{self.BASE_URL}/api/satelliteimages/process/composite"
         response = requests.post(url, headers=self.headers, json=command.dict(), stream=True)
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
 
         if response.status_code != 200:
             return models.ProcessCompositeErrorResponseDto(**response.json())
@@ -94,6 +109,9 @@ class ClearSkyVisionAPI:
         url = f"{self.BASE_URL}/api/tasking/models"
         response = requests.post(url, headers=self.headers)
 
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
         return models.TaskingModelsQueryResponseDto(**response.json())
 
     def get_tasking_orders(self, recurring_only: bool) -> models.TaskingOrdersQueryResponseDto:
@@ -105,6 +123,9 @@ class ClearSkyVisionAPI:
         url = f"{self.BASE_URL}/api/tasking/orders?recurringOnly={recurring_only}"
         response = requests.post(url, headers=self.headers)
 
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
         return models.TaskingOrdersQueryResponseDto(**response.json())
 
     def search_orderable_tiles(self, query: models.TaskingTileSearchQueryDto) -> models.TaskingTileSearchQueryResponseDto:
@@ -113,6 +134,9 @@ class ClearSkyVisionAPI:
         """
         url = f"{self.BASE_URL}/api/tasking/search/tiles"
         response = requests.post(url, headers=self.headers, json=query.dict())
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
 
         return models.TaskingTileSearchQueryResponseDto(**response.json())
 
@@ -124,5 +148,8 @@ class ClearSkyVisionAPI:
         """
         url = f"{self.BASE_URL}/api/tasking/orders/cancel?taskOrderGuid={taskorder_guid}"
         response = requests.delete(url, headers=self.headers)
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
 
         return response.status_code != 200
