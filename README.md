@@ -173,15 +173,10 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS
 
 ---
 
-## Python Scripts
+## Python Scripts & Tools
 
-* [Tile API Example](api_tools/example_tile_api.py)
-* [Processing API Example](api_tools/examples_processing_api.py)
-
-## Jupyter Notebooks
-
-
-* [Processing API Example](notebook/Processing_API_Notebook.ipynb)
+* [Example Code For Interacting with ClearSky API](example_clearsky_api.py)
+* [Tool for buffering request polygon](./tools/utm_boundingbox_to_wgs84.py)
 
 ## Additional Resources
 
@@ -210,8 +205,7 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS
 
 ## Change Log
 
-> Updated on 2024/11/21 - showcase tasking
-
-> Updated on 2024/02/07
+* Updated on 2024/11/21 - showcase tasking
+* Updated on 2024/02/07
 
 Contact us at info@clearsky.vision for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.

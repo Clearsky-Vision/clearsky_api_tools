@@ -2,8 +2,8 @@
 Collection of Request and Response models used by the ClearSky Vision API
 """
 
-from typing import Dict, Generic, List, Optional, TypeVar, Union
-from pydantic import BaseModel, root_validator
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from pydantic import BaseModel, ConfigDict, parse_obj_as, root_validator, validator
 from datetime import date
 
 T = TypeVar("T")
@@ -19,11 +19,19 @@ class ServiceResult(BaseModel, Generic[T]):
     Error: Optional["ErrorModel"]
     Data: Optional[T]
 
+    @validator("Data", pre=True, always=True)
+    def validate_data(cls, value):
+        # Retrieve the generic type from the model class
+        generic_type = getattr(cls, "__generic_type__", None)
+        if value is not None and generic_type is not None:
+            return parse_obj_as(generic_type, value)
+        return value
+
 
 class ServiceResultError(BaseModel):
     Succeeded: bool
     Error: ErrorModel
-    Data: Optional[Dict[str, str]]
+    Data: Optional[Dict]
 
 
 class GeoJsonModel(BaseModel):
@@ -56,7 +64,7 @@ class ApiKeyData(BaseModel):
 
 
 class ApiKeyInfoQueryResponseDto(ServiceResult[ApiKeyData]):
-    pass
+    __generic_type__ = ApiKeyData
 
 
 # --------------------------------------------------
@@ -96,7 +104,7 @@ class SearchAvailableImageryData(BaseModel):
 
 
 class SearchAvailableImageryQueryResponseDto(ServiceResult[SearchAvailableImageryData]):
-    pass
+    __generic_type__ = SearchAvailableImageryData
 
 
 # ----------------------------------------------------
@@ -105,8 +113,8 @@ class SearchAvailableImageryQueryResponseDto(ServiceResult[SearchAvailableImager
 
 
 class ProcessCompositeEstimateQueryDto(BaseModel):
-    Wkt: Optional[str]
-    GeoJson: Optional[GeoJsonModel]
+    Wkt: Optional[str] = None
+    GeoJson: Optional[GeoJsonModel] = None
     Resolution: int = 10  # pixel resolution in meters, check api documentation for available options
     FileType: str = "tif"  # check api documentation for available options
     EpsgProjection: int  # 4326, 32632, or any other valid EPSG
@@ -126,11 +134,11 @@ class ProcessCompositeEstimateQueryDto(BaseModel):
 
 class ProcessCompositeEstimateData(BaseModel):
     AreaEstimateKm2: float
-    CreditEstimate: int
+    CreditEstimate: float
 
 
 class ProcessCompositeEstimateQueryResponseDto(ServiceResult[ProcessCompositeEstimateData]):
-    pass
+    __generic_type__ = ProcessCompositeEstimateData
 
 
 # -------------------------------------------------
@@ -144,6 +152,9 @@ class ProcessCompositeCommandDto(ProcessCompositeEstimateQueryDto):
     SatelliteConstellations: List[str]  # check api documentation for available options
     Model: str  # check api documentation for available options
     UtmGridForcePixelResolutionSize: bool  #
+
+    class Config:
+        json_encoders = {date: lambda v: v.isoformat()}  # Serialize dates to ISO 8601 strings
 
 
 class ProcessCompositeErrorResponseDto(ServiceResultError):
@@ -170,7 +181,7 @@ class TaskingModelsData(BaseModel):
 
 
 class TaskingModelsQueryResponseDto(ServiceResult[TaskingModelsData]):
-    pass
+    __generic_type__ = TaskingModelsData
 
 
 # -------------------------------------------------
@@ -200,7 +211,7 @@ class TaskingOrdersData(BaseModel):
 
 
 class TaskingOrdersQueryResponseDto(ServiceResult[TaskingOrdersData]):
-    pass
+    __generic_type__ = TaskingOrdersData
 
 
 # -------------------------------------------------
@@ -257,11 +268,11 @@ class TaskingOrderEstimateQueryResponseData(BaseModel):
 
 
 class TaskingOrderEstimateQueryResponseDto(ServiceResult[TaskingOrderEstimateQueryResponseData]):
-    pass
+    __generic_type__ = TaskingOrderEstimateQueryResponseData
 
 
 class TaskingOrderCreateCommandResponseDto(ServiceResult[TaskOrderDto]):
-    pass
+    __generic_type__ = TaskOrderDto
 
 
 # -------------------------------------------------
@@ -294,4 +305,4 @@ class TaskingTileSearchQueryResponseData(BaseModel):
 
 
 class TaskingTileSearchQueryResponseDto(ServiceResult[TaskingTileSearchQueryResponseData]):
-    pass
+    __generic_type__ = TaskingTileSearchQueryResponseData
