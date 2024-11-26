@@ -10,7 +10,7 @@ import requests
 import cgi
 import os
 
-from tqdm import tqdm
+from tqdm import tqdm  # for progress bar only
 
 import models
 
@@ -66,15 +66,18 @@ class ClearSkyVisionAPI:
     def search_available_imagery(
         self,
         query: models.SearchAvailableImageryQueryDto,
-    ) -> models.SearchAvailableImageryQueryResponseDto:
+    ) -> Union[models.SearchAvailableImageryQueryResponseDto, models.ServiceResultError]:
         """
         Search Available Imagery.
         """
         url = f"{self.BASE_URL}/api/satelliteimages/search/available"
-        response = requests.post(url, headers=self.headers, json=query.dict())
+        response = requests.post(url, headers=self.headers, data=query.json())
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
+
+        if response.status_code != 200:
+            return models.ServiceResultError(**response.json())
 
         return models.SearchAvailableImageryQueryResponseDto.parse_obj(response.json())
 
@@ -86,7 +89,7 @@ class ClearSkyVisionAPI:
         Get Estimate for Processing Composite Satellite Imagery.
         """
         url = f"{self.BASE_URL}/api/satelliteimages/process/composite/estimate"
-        response = requests.post(url, headers=self.headers, json=query.dict())
+        response = requests.post(url, headers=self.headers, data=query.json())
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
@@ -98,7 +101,7 @@ class ClearSkyVisionAPI:
         directory_to_save_file: str,
         command: models.ProcessCompositeCommandDto,
         show_progress=True,
-    ) -> Union[str, models.ProcessCompositeErrorResponseDto]:
+    ) -> Union[str, models.ServiceResultError]:
         """
         Process Composite Satellite Imagery.
 
@@ -116,14 +119,13 @@ class ClearSkyVisionAPI:
 
         url = f"{self.BASE_URL}/api/satelliteimages/process/composite"
         request_start = datetime.now()
-        json = command.json()
-        with requests.post(url, headers=self.headers, data=json, stream=True) as response:
+        with requests.post(url, headers=self.headers, data=command.json(), stream=True) as response:
 
             if response.status_code == 401:
                 raise Exception("API Key is Unauthorized")
 
             if response.status_code != 200:
-                return models.ProcessCompositeErrorResponseDto(**response.json())
+                return models.ServiceResultError(**response.json())
 
             file_path = self._download_file_with_tdqm_progress(directory_to_save_file, show_progress, request_start, command.FileType, response)
 

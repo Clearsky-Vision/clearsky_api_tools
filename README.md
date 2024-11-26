@@ -175,7 +175,8 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS
 
 ## Python Scripts & Tools
 
-* [Example Code For Interacting with ClearSky API](example_clearsky_api.py)
+* [Example Code For Interacting with ClearSky API](./example_clearsky_api.py)
+* [Service Class Wrapping ClearSky API](./api_service.py)
 * [Tool for buffering request polygon](./tools/utm_boundingbox_to_wgs84.py)
 
 ## Additional Resources

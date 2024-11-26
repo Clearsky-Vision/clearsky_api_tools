@@ -73,10 +73,10 @@ class ApiKeyInfoQueryResponseDto(ServiceResult[ApiKeyData]):
 
 
 class SearchAvailableImageryQueryDto(BaseModel):
-    Wkt: Optional[str]
-    GeoJson: Optional[GeoJsonModel]
-    From: Optional[date]
-    Until: Optional[date]
+    Wkt: Optional[str] = None
+    GeoJson: Optional[GeoJsonModel] = None
+    From: Optional[date] = None
+    Until: Optional[date] = None
 
     @root_validator
     def check_wkt_or_geojson(cls, values):
