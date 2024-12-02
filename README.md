@@ -47,15 +47,17 @@ This data source is unique due to the following features:
 
 ## Getting Started
 
+This repository contains a python API wrapper for the ClearSky Vision API, as well as an example implementation for interacting with the API using the wrapper. Check out the wrapper [api_service.py](./api_service.py). It is assumed that a valid API key is available, if you do not have one check out [how to get a trial API key](#api-credentials)
+
 For further details or support, contact **info@clearsky.vision**.
 
 ### Installation Instructions
-This project assumes you are able to install the requirements: in [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.8-3.9 and 3.12 have been verified to work, but versions >= 3.8 should work assuming requirements install successfully. It can be used or integrated into your existing workflow as is if you just import the [api_service.py](./api_service.py) wrapping the ClearSky Vision API.
+The project requirements are installed using [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.8-3.9 and 3.12 have been verified to work, but versions >= 3.8 should work assuming requirements install successfully. 
 
 ### API Credentials
-All API calls requires valid credentials which for testing purposes can be acquired from [eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get €125 worth of credits. The credentials will be sent to the provided email straightaway. 
+All API calls requires valid credentials which for testing purposes can be acquired from [eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get €125 worth of credits. The credentials will be sent to the provided email straight away. 
 
-![API KEY GIF](https://clearsky.vision/wp-content/uploads/2024/01/Github_GIF.gif)
+![API KEY GIF](./get-trial-key.gif)
 
 Alternatively, you can ask for testing access by writing to info@clearsky.vision and get in contact with a human.
 
@@ -75,7 +77,7 @@ The cloudless data has been corrected with Sen2Cor for bottom-of-atmosphere dist
 | **Shortwave Infrared 1**     | B11       | 10   |   1613 ± 47  |    9   |
 | **Shortwave Infrared 2**    | B12        | 10      |  2200 ± 92  |    10   |
 
-The API data is served in ‘int16’ and the designated value for 'no data' is -32768. The reflectance scaling factor for  spectral bands is 10000, while for indices the values should be divided by 32767. All indices precomputed on our servers range from -1 to 1, if larger ranges are needed, we recommend that the user downloads the needed bands and then do the index calculation.
+The API data is served in `int16` by default and the designated value for 'no data' is `-32768`. The reflectance scaling factor for spectral bands is `10000`, while for indices the values should be divided by 32767. All indices precomputed on our servers range from `-1` to `1`, if larger ranges are needed, we recommend that the user downloads the needed bands and then do the index calculation.
 
 Additional metadata tags have been integrated into GeoTIFF files retrieved through the Processing API:
 
@@ -86,12 +88,14 @@ Additional metadata tags have been integrated into GeoTIFF files retrieved throu
 When a request overlaps multiple tiles, the "IMAGE_VERSION" and "MODEL_VERSION" tags will list values for each intersecting tile, separated by commas. The order of these values corresponds to the internal positioning of the tiles within our data storage, not by numerical sorting. For instance, if a request intersects four tiles, where three use model version 13 and the last uses model version 15, the "MODEL_VERSION" tag might display as "13,15,13,13". This arrangement ensures that any change in the data, such as a change in version from "13,15,13,13" to "13,15,13,15", indicates that the last tile in our internal sorting has been updated to version 15.
 
 
-### Tile vs Processing API
+### Tile vs Composite 
 
-* **Tile API:** A ClearSky Vision tile is always 2621 km2 (5120x5120 px) and it may contain no-data near shores or UTM zone transitions. A tile is returned as a Cloud Optimized GeoTIFF (COG), meaning it contains multiple resolutions that can be extracted one-by-one. The Tile API does not allow for any processing.  
-* **Processing API:** You only pay for the data you need. The Processing API can cut and merge tiles into custom bounding boxes (including single and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. Its purpose is to deliver analysis-ready data in whatever format is required by the user. 
+* **Tile:** A ClearSky Vision tile is currently always 2621 km2 (5120x5120 px), based on a specific EPSG (e.g. EPSG:32632), and may contain no-data pixels `-32768` near shores or UTM zone transitions. 
+* **Composite:** You specify exactly the data you need. Composites can cut and merge tiles into custom bounding boxes (including single polygons and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. Its purpose is to deliver analysis-ready data in whatever format is required by the user. 
 
-As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.1 km), you might want to utilize the Tile API as it will be cheaper in credits. Our tiles are also faster to acquire as there is no processing happening, the only delay is download time. 
+As a rule of thumb, if the ratio between your area of interest and tile area is larger than that of the tile price vs composite price, you might want to order the Tiles rather than composites as it will be cheaper.
+
+Data ordered using tiles or composites will be accessible for a single download request using composite processing as of 2024-12-01, but there are plans TBD to require additional steps for processing composite downloads in areas using ordered tiles. Imagine asynchronous processing with polling of composite processing status rather than just waiting for a response with the imagery data for the request.
 
 
 ## Key Features:
