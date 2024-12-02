@@ -4,7 +4,7 @@ Collection of Request and Response models used by the ClearSky Vision API
 
 from typing import Dict, Generic, List, Optional, TypeVar, Union
 import uuid
-from pydantic import BaseModel, TypeAdapter, field_validator, model_validator, validator
+from pydantic import BaseModel, TypeAdapter, field_validator, model_validator
 from datetime import date
 
 T = TypeVar("T")
@@ -19,14 +19,6 @@ class ServiceResult(BaseModel, Generic[T]):
     Succeeded: bool
     Error: Optional["ErrorModel"]
     Data: Optional[T]
-
-    # @validator("Data", pre=True, always=True)
-    # def validate_data(cls, value):
-    #     # Retrieve the generic type from the model class
-    #     generic_type = getattr(cls, "__generic_type__", None)
-    #     if value is not None and generic_type is not None:
-    #         return None
-    #     return value
 
     @field_validator("Data", mode="before")
     @classmethod

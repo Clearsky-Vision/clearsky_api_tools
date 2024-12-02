@@ -50,7 +50,7 @@ This data source is unique due to the following features:
 For further details or support, contact **info@clearsky.vision**.
 
 ### Installation Instructions
-This project assumes you are able to install the requirements: in [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.19 or 3.12 has been verified to work, but versions >= 3.8 may work assuming requirements install successfully. It can be used or integrated into your existing workflow as is if you just import the [api_service.py](./api_service.py) wrapping the ClearSky Vision API.
+This project assumes you are able to install the requirements: in [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.8-3.9 and 3.12 have been verified to work, but versions >= 3.8 should work assuming requirements install successfully. It can be used or integrated into your existing workflow as is if you just import the [api_service.py](./api_service.py) wrapping the ClearSky Vision API.
 
 ### API Credentials
 All API calls requires valid credentials which for testing purposes can be acquired from [eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get €125 worth of credits. The credentials will be sent to the provided email straightaway. 
