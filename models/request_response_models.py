@@ -336,9 +336,9 @@ class TaskingOrderCreateCommandResponseDto(ServiceResult[TaskOrderDto]):
 
 
 class TaskingTileSearchQueryDto(BaseModel):
-    Wkt: Optional[str]
-    GeoJson: Optional[GeoJsonModel]
-    TileGuids: Optional[List[uuid.UUID]]
+    Wkt: Optional[str] = None
+    GeoJson: Optional[GeoJsonModel] = None
+    TileGuids: Optional[List[uuid.UUID]] = None
 
     @model_validator(mode="before")
     def check_only_one_field_set(cls, values):

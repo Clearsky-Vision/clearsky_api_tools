@@ -61,8 +61,7 @@ def main():
     print(f"API key Download Credit Limit, allowing for downloads being paid in arrears: {apikey_info.Data.CreditLimit} credits")
     print(f"API key Download Credits: {apikey_info.Data.CreditAmount} credits")
     print(f"API key Order Credit Limit, allowing for orders being paid in arrears: {apikey_info.Data.EuroCreditLimit} credits")
-    print(f"API key Order Credits: {apikey_info.Data.EuroCreditAmount} credits")
-    print()
+    print(f"API key Order Credits: {apikey_info.Data.EuroCreditAmount} credits\n")
 
     ############################## ------------- ##############################
     #                              Tasking Models                             #
@@ -79,6 +78,24 @@ def main():
         optional_satellites = [sat.SatelliteConstellation for sat in model.SupportedSatelliteConstellations if sat.Optional]
         print(f"{model_name}: requires {required_satellites}, allows {optional_satellites}")
     print("############################## ######################## ##############################")
+
+    ############################## ------------- ##############################
+    #                          Search Orderable Tiles                         #
+    ############################## ------------- ##############################
+
+    orderable_tiles_query_dto = models.TaskingTileSearchQueryDto(
+        TileGuids=None,  # [uuid.UUID("1f5545aa-4a60-4c37-8215-282c10cb2f21")],
+        Wkt=test_wkt,
+        GeoJson=None,
+    )
+
+    orderable_tiles_search_result = api_service.search_orderable_tiles(orderable_tiles_query_dto)
+
+    assert orderable_tiles_search_result.Data is not None
+
+    print("\nSearching for orderable tiles:")
+    for tile in orderable_tiles_search_result.Data.Tiles:
+        print(f"Tile {tile.Guid} in EPSG {tile.Epsg} found")
 
     ############################## ------------- ##############################
     #                          Tasking Order Estimate                         #
@@ -148,8 +165,6 @@ def main():
     for index, estimate_result in estimate_results.items():
         print(f"Process Estimate {index + 1} has an estimated download cost of {estimate_result[1].Data.CreditEstimate} credits")
 
-    print()
-
     ############################## ------------- ##############################
     #                         Search Available Imagery                        #
     ############################## ------------- ##############################
@@ -189,7 +204,7 @@ def main():
             for geog in model.DatesByGeog:
                 available_imagery_dates.extend([datetime.strptime(datestr, "%Y-%m-%d").date() for datestr in geog.Dates])
 
-    print(f"Found {len(available_imagery_dates)} available imagery dates for composite processing")
+    print(f"\nFound {len(available_imagery_dates)} available imagery dates for composite processing")
 
     ############################## ------------- ##############################
     #                    Composite Processing & Download                      #
