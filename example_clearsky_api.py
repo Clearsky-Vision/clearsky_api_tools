@@ -117,7 +117,7 @@ def main():
 
     tasking_estimate_result = api_service.retrieve_estimate_for_tasking_order(tasking_estimate_dto)
 
-    tasking_estimate_failed = not isinstance(tasking_estimate_result, models.TaskingOrderEstimateQueryResponseDto) and not tasking_estimate_result.Succeeded
+    tasking_estimate_failed = not isinstance(tasking_estimate_result, models.TaskingOrderEstimateQueryResponseDto) or not tasking_estimate_result.Succeeded
 
     if tasking_estimate_failed:
         assert isinstance(tasking_estimate_result, models.ServiceResultError)
@@ -134,6 +134,46 @@ def main():
         This can be higher than 1 due to ordering rules (AoIs, orders require extents/bounding boxes)
         """
     )
+
+    ############################## ------------- ##############################
+    #                          Tasking Order Creation                         #
+    ############################## ------------- ##############################
+
+    if execute_endpoints_requiring_credits:
+        print("skipping creation of task order due to execute_endpoints_requiring_credits not being set")
+    else:
+        create_tasking_order_result = api_service.create_tasking_order(tasking_estimate_dto)
+
+        create_tasking_order_failed = not isinstance(create_tasking_order_result, models.TaskingOrderCreateCommandResponseDto) or not create_tasking_order_result.Succeeded
+
+        if create_tasking_order_failed:
+            assert isinstance(create_tasking_order_result, models.ServiceResultError)
+            create_tasking_order_result.raise_issues()
+
+    ############################## ------------- ##############################
+    #                         Tasking Orders Retrieval                        #
+    ############################## ------------- ##############################
+
+    get_tasking_orders_result = api_service.get_tasking_orders(recurring_only=False)
+
+    get_tasking_orders_failed = not get_tasking_orders_result.Succeeded
+
+    if get_tasking_orders_failed:
+        assert get_tasking_orders_result.Error is not None
+        raise Exception(f"retrieval of tasking orders failed, see {get_tasking_orders_result.Error.Message}")
+
+    ############################## ------------- ##############################
+    #                           Cancel Tasking Order                          #
+    ############################## ------------- ##############################
+    assert get_tasking_orders_result.Data is not None
+    taskorder_to_cancel = next((tasking_order for tasking_order in get_tasking_orders_result.Data.TaskOrders if tasking_order.To is None), None)
+    if taskorder_to_cancel:
+        cancel_tasking_order_result = api_service.cancel_recurring_order(taskorder_to_cancel.TaskOrderGuid)
+
+        cancel_tasking_order_failed = not cancel_tasking_order_result
+
+        if cancel_tasking_order_failed:
+            print(f"cancellation of tasking order {taskorder_to_cancel.TaskOrderGuid} failed")
 
     ############################## ------------- ##############################
     #                            Composite Estimate                           #
@@ -210,11 +250,11 @@ def main():
     #                    Composite Processing & Download                      #
     ############################## ------------- ##############################
 
-    if not execute_endpoints_requiring_credits:
+    if execute_endpoints_requiring_credits:
         print("skipping download of imagery due to execute_endpoints_requiring_credits not being set")
     else:
         composite_dtos: List[models.ProcessCompositeCommandDto] = []
-        imagery_dates = [date(2024, 11, 1)]
+        imagery_dates = [initial_date]  # available_imagery_dates
 
         for estimate_dto in estimate_dtos:
             for imagery_date in imagery_dates:
@@ -242,7 +282,7 @@ def main():
 
         for index, composite_result in process_composite_results.items():
 
-            failed = not isinstance(composite_result[1], str) and not composite_result[1].Succeeded
+            failed = not isinstance(composite_result[1], str) or not composite_result[1].Succeeded
 
             if failed:
                 print(f"process composite job {index} failed: " + str(composite_result[1].Error.Message))
@@ -264,7 +304,7 @@ def process_composite_images(api_service: ClearSkyVisionAPI, concurrent_requests
     """
 
     process_composite_jobs = [
-        {FUNCTION: api_service.retrieve_composite_of_satellite_imagery, FUNCTION_ARGS: (composite_results_directory, dto, False), REQUEST_PARAMETERS: dto} for dto in dtos
+        {FUNCTION: api_service.process_composite_of_satellite_imagery, FUNCTION_ARGS: (composite_results_directory, dto, False), REQUEST_PARAMETERS: dto} for dto in dtos
     ]
     process_composite_results: Dict = _process_api_requests_concurrently(concurrent_requests, process_composite_jobs)
     return process_composite_results
@@ -276,7 +316,7 @@ def process_estimates(api_service: ClearSkyVisionAPI, concurrent_requests: int, 
 
     Retrieving estimate has no cost
     """
-    estimate_jobs = [{FUNCTION: api_service.retrieve_estimate_for_composite_of_satellite_imagery, FUNCTION_ARGS: (dto,), REQUEST_PARAMETERS: dto} for dto in dtos]
+    estimate_jobs = [{FUNCTION: api_service.retrieve_estimate_for_process_composite_of_satellite_imagery, FUNCTION_ARGS: (dto,), REQUEST_PARAMETERS: dto} for dto in dtos]
     estimate_results: Dict = _process_api_requests_concurrently(concurrent_requests, estimate_jobs)
     return estimate_results
 

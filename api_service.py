@@ -81,7 +81,7 @@ class ClearSkyVisionAPI:
 
         return models.SearchAvailableImageryQueryResponseDto.model_validate(response.json())
 
-    def retrieve_estimate_for_composite_of_satellite_imagery(
+    def retrieve_estimate_for_process_composite_of_satellite_imagery(
         self,
         query: models.ProcessCompositeEstimateQueryDto,
     ) -> models.ProcessCompositeEstimateQueryResponseDto:
@@ -96,7 +96,7 @@ class ClearSkyVisionAPI:
 
         return models.ProcessCompositeEstimateQueryResponseDto.model_validate(response.json())
 
-    def retrieve_composite_of_satellite_imagery(
+    def process_composite_of_satellite_imagery(
         self,
         directory_to_save_file: str,
         command: models.ProcessCompositeCommandDto,
@@ -178,7 +178,7 @@ class ClearSkyVisionAPI:
         recurring_only: only retrieve recurring taskorders
         """
         url = f"{self.BASE_URL}/api/tasking/orders?recurringOnly={recurring_only}"
-        response = requests.post(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers)
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
@@ -218,12 +218,33 @@ class ClearSkyVisionAPI:
 
         return models.TaskingOrderEstimateQueryResponseDto.model_validate(response.json())
 
+    def create_tasking_order(
+        self,
+        command: models.CreateTaskingOrderEstimateQueryAndCreateCommandDto,
+    ) -> Union[models.TaskingOrderCreateCommandResponseDto, models.ServiceResultError]:
+        """
+        Create Tasking Order.
+
+        !!IMPORTANT!!
+        Evaluate the estimate for a tasking order before creating a tasking order.
+        """
+        url = f"{self.BASE_URL}/api/tasking/orders"
+        response = requests.post(url, headers=self.headers, data=command.model_dump_json())
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
+        if response.status_code != 200:
+            return models.ServiceResultError(**response.json())
+
+        return models.TaskingOrderCreateCommandResponseDto.model_validate(response.json())
+
     def cancel_recurring_order(
         self,
         taskorder_guid: str,
     ) -> bool:
         """
-        Cancel Recurring Tasking Order.
+        Cancel Recurring Tasking Order, ensuring the recurring order does not persist next month.
 
         taskorder_guid: Guid identifying the Tasking Order
         """
@@ -233,4 +254,4 @@ class ClearSkyVisionAPI:
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
 
-        return response.status_code != 200
+        return response.status_code == 200
