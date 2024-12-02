@@ -211,7 +211,7 @@ def main():
     ############################## ------------- ##############################
 
     if not execute_endpoints_requiring_credits:
-        print("skipping download of imagery due to execute_endpoints_requiring_credits being set")
+        print("skipping download of imagery due to execute_endpoints_requiring_credits not being set")
     else:
         composite_dtos: List[models.ProcessCompositeCommandDto] = []
         imagery_dates = [date(2024, 11, 1)]
