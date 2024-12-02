@@ -2,8 +2,9 @@
 Collection of Request and Response models used by the ClearSky Vision API
 """
 
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
-from pydantic import BaseModel, ConfigDict, parse_obj_as, root_validator, validator
+from typing import Dict, Generic, List, Optional, TypeVar, Union
+import uuid
+from pydantic import BaseModel, TypeAdapter, field_validator, model_validator, validator
 from datetime import date
 
 T = TypeVar("T")
@@ -19,12 +20,28 @@ class ServiceResult(BaseModel, Generic[T]):
     Error: Optional["ErrorModel"]
     Data: Optional[T]
 
-    @validator("Data", pre=True, always=True)
-    def validate_data(cls, value):
-        # Retrieve the generic type from the model class
+    # @validator("Data", pre=True, always=True)
+    # def validate_data(cls, value):
+    #     # Retrieve the generic type from the model class
+    #     generic_type = getattr(cls, "__generic_type__", None)
+    #     if value is not None and generic_type is not None:
+    #         return None
+    #     return value
+
+    @field_validator("Data", mode="before")
+    @classmethod
+    def validate_data(cls, value, info):
+        # Retrieve the generic type from __generic_type__, fallback to __parameters__
         generic_type = getattr(cls, "__generic_type__", None)
-        if value is not None and generic_type is not None:
-            return parse_obj_as(generic_type, value)
+        if generic_type is None and hasattr(cls, "__parameters__"):
+            parameters = cls.__parameters__  # type: ignore
+            if parameters and len(parameters) == 1:
+                generic_type = parameters[0]
+
+        if generic_type and value is not None:
+            type_adapter = TypeAdapter(generic_type)
+            return type_adapter.validate_python(value)
+
         return value
 
 
@@ -32,6 +49,10 @@ class ServiceResultError(BaseModel):
     Succeeded: bool
     Error: ErrorModel
     Data: Optional[Dict]
+
+    def raise_issues(self):
+        issues = [] if not isinstance(self.Data, Dict) else [issue for issue in self.Data.values()]
+        raise Exception(self.Error.Message + " " + " ".join([", ".join(issue) for issue in issues]))
 
 
 class GeoJsonModel(BaseModel):
@@ -44,6 +65,22 @@ class GeoJsonModel(BaseModel):
     ] = None
     geometries: Optional[List["GeoJsonModel"]] = None  # For "GeometryCollection"
 
+    @staticmethod
+    def from_geojson(geojson_data: dict) -> "GeoJsonModel":
+        return GeoJsonModel.model_validate(geojson_data)
+
+    def to_geojson(self) -> dict:
+        return self.model_dump(exclude_none=True)
+
+    def to_wkt(self) -> str:
+        """
+        Converts the GeoJsonModel to WKT using Shapely.
+        """
+        from shapely.geometry import shape
+
+        shapely_geometry = shape(self.to_geojson())
+        return shapely_geometry.wkt
+
 
 # -----------------------------------
 # Get API Key Info Models
@@ -52,8 +89,8 @@ class GeoJsonModel(BaseModel):
 
 class ApiKeyData(BaseModel):
     Key: str
-    CreditAmount: int
-    EuroCreditAmount: int
+    CreditAmount: float
+    EuroCreditAmount: float
     CreditLimit: int
     EuroCreditLimit: int
     ContactInfo: str
@@ -78,13 +115,18 @@ class SearchAvailableImageryQueryDto(BaseModel):
     From: Optional[date] = None
     Until: Optional[date] = None
 
-    @root_validator
-    def check_wkt_or_geojson(cls, values):
-        wkt, geojson = values.get("Wkt"), values.get("GeoJson")
-        if not wkt and not geojson:
-            raise ValueError("Either Wkt or GeoJson must be provided.")
-        if wkt and geojson:
-            raise ValueError("Only one of Wkt or GeoJson must be provided.")
+    @model_validator(mode="before")
+    def check_only_one_field_set(cls, values):
+        wkt = values.get("Wkt")
+        geojson = values.get("GeoJson")
+
+        fields_set = sum(bool(field) for field in [wkt, geojson])
+
+        if fields_set == 0:
+            raise ValueError("One of Wkt or GeoJson must be provided.")
+        if fields_set > 1:
+            raise ValueError("Only one of Wkt or GeoJson can be provided at a time.")
+
         return values
 
 
@@ -122,13 +164,18 @@ class ProcessCompositeEstimateQueryDto(BaseModel):
     UtmDataSelectionMode: str = "combined_utm"  # only applicable with UTM EPSGs, check api documentation for available options
     Bandnames: str = "all"  # check api documentation for available options
 
-    @root_validator
-    def check_wkt_or_geojson(cls, values):
-        wkt, geojson = values.get("Wkt"), values.get("GeoJson")
-        if not wkt and not geojson:
-            raise ValueError("Either Wkt or GeoJson must be provided.")
-        if wkt and geojson:
-            raise ValueError("Only one of Wkt or GeoJson must be provided.")
+    @model_validator(mode="before")
+    def check_only_one_field_set(cls, values):
+        wkt = values.get("Wkt")
+        geojson = values.get("GeoJson")
+
+        fields_set = sum(bool(field) for field in [wkt, geojson])
+
+        if fields_set == 0:
+            raise ValueError("One of Wkt or GeoJson must be provided.")
+        if fields_set > 1:
+            raise ValueError("Only one of Wkt or GeoJson can be provided at a time.")
+
         return values
 
 
@@ -153,8 +200,11 @@ class ProcessCompositeCommandDto(ProcessCompositeEstimateQueryDto):
     Model: str  # check api documentation for available options
     UtmGridForcePixelResolutionSize: bool  #
 
-    class Config:
-        json_encoders = {date: lambda v: v.isoformat()}  # Serialize dates to ISO 8601 strings
+    model_config = {
+        "json_encoders": {
+            date: lambda v: v.isoformat(),  # Serialize dates to ISO 8601 strings
+        }
+    }
 
 
 class ProcessCompositeErrorResponseDto(ServiceResultError):
@@ -228,17 +278,22 @@ class CreateTaskingOrderEstimateQueryAndCreateCommandDto(BaseModel):
     From: date
     To: Optional[date]
     SatelliteConstellations: List[str]  # check api documentation for available options
-    Tiles: Optional[List[str]]
-    Wkt: Optional[str]
-    GeoJson: Optional[GeoJsonModel]
+    Tiles: Optional[List[uuid.UUID]] = None
+    Wkt: Optional[str] = None  # Must be a geometrycollection of polygon and/or multipolygons. Each Polygon or MultiPolygon count as an AOI of minimum 1 km2 w.r.t. pricing
+    GeoJson: Optional[GeoJsonModel] = None
 
-    @root_validator
-    def check_wkt_or_geojson(cls, values):
-        wkt, geojson = values.get("Wkt"), values.get("GeoJson")
-        if not wkt and not geojson:
-            raise ValueError("Either Wkt or GeoJson must be provided.")
-        if wkt and geojson:
-            raise ValueError("Only one of Wkt or GeoJson must be provided.")
+    @model_validator(mode="before")
+    def check_only_one_field_set(cls, values):
+        wkt = values.get("Wkt")
+        geojson = values.get("GeoJson")
+
+        fields_set = sum(bool(field) for field in [wkt, geojson])
+
+        if fields_set == 0:
+            raise ValueError("One of Wkt or GeoJson must be provided.")
+        if fields_set > 1:
+            raise ValueError("Only one of Wkt or GeoJson can be provided at a time.")
+
         return values
 
 
@@ -283,14 +338,21 @@ class TaskingOrderCreateCommandResponseDto(ServiceResult[TaskOrderDto]):
 class TaskingTileSearchQueryDto(BaseModel):
     Wkt: Optional[str]
     GeoJson: Optional[GeoJsonModel]
+    TileGuids: Optional[List[uuid.UUID]]
 
-    @root_validator
-    def check_wkt_or_geojson(cls, values):
-        wkt, geojson = values.get("Wkt"), values.get("GeoJson")
-        if not wkt and not geojson:
-            raise ValueError("Either Wkt or GeoJson must be provided.")
-        if wkt and geojson:
-            raise ValueError("Only one of Wkt or GeoJson must be provided.")
+    @model_validator(mode="before")
+    def check_only_one_field_set(cls, values):
+        wkt = values.get("Wkt")
+        geojson = values.get("GeoJson")
+        tile_guids = values.get("TileGuids")
+
+        fields_set = sum(bool(field) for field in [wkt, geojson, tile_guids])
+
+        if fields_set == 0:
+            raise ValueError("One of Wkt, GeoJson, or TileGuids must be provided.")
+        if fields_set > 1:
+            raise ValueError("Only one of Wkt, GeoJson, or TileGuids can be provided at a time.")
+
         return values
 
 

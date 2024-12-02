@@ -16,7 +16,6 @@
     * [Data Specifications](#data-specifications)
     * [Tile vs Processing API](#tile-vs-processing-api)
 * [Key Features](#key-features)
-    * [Importing Libraries](#importing-libraries)
     * [Acquiring User Credentials](#acquiring-user-credentials)
     * [Functions for 'Data Availability'](#functions-for-data-availability)
     * [Requesting 'Data Availability'](#requesting-data-availability)
@@ -51,7 +50,7 @@ This data source is unique due to the following features:
 For further details or support, contact **info@clearsky.vision**.
 
 ### Installation Instructions
-This project does not require any special installation procedures. It can be used or integrated into your existing workflow as is. To get started, simply clone or download the repository to your local machine.
+This project assumes you are able to install the requirements: in [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.12 or higher is assumed, but lower versions may work assuming requirements install successfully. It can be used or integrated into your existing workflow as is if you just import the [api_service.py](./api_service.py) wrapping the ClearSky Vision API.
 
 ### API Credentials
 All API calls requires valid credentials which for testing purposes can be acquired from [eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get €125 worth of credits. The credentials will be sent to the provided email straightaway. 
@@ -100,14 +99,6 @@ As a rule of thumb, if your area of interest is larger than 10% of a tile (~262.
 2. **Estimate area and credit costs** for the requested data.
 3. **Download cloud-free Sentinel-2 imagery**.
 4. **Visualize acquired satellite imagery** for further analysis.
-
-### Importing Libraries
-
-Install the necessary Python libraries for running the examples:
-
-```bash
-pip install requests tqdm
-```
 
 ### Acquiring User Credentials
 
@@ -206,7 +197,7 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS
 
 ## Change Log
 
-* Updated on 2024/11/21 - showcase tasking
+* Updated on 2024/12/02 - showcase tasking with extended examples
 * Updated on 2024/02/07
 
 Contact us at info@clearsky.vision for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.

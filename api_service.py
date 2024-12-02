@@ -61,7 +61,7 @@ class ClearSkyVisionAPI:
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
 
-        return models.ApiKeyInfoQueryResponseDto.parse_obj(response.json())
+        return models.ApiKeyInfoQueryResponseDto.model_validate(response.json())
 
     def search_available_imagery(
         self,
@@ -71,7 +71,7 @@ class ClearSkyVisionAPI:
         Search Available Imagery.
         """
         url = f"{self.BASE_URL}/api/satelliteimages/search/available"
-        response = requests.post(url, headers=self.headers, data=query.json())
+        response = requests.post(url, headers=self.headers, data=query.model_dump_json())
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
@@ -79,7 +79,7 @@ class ClearSkyVisionAPI:
         if response.status_code != 200:
             return models.ServiceResultError(**response.json())
 
-        return models.SearchAvailableImageryQueryResponseDto.parse_obj(response.json())
+        return models.SearchAvailableImageryQueryResponseDto.model_validate(response.json())
 
     def retrieve_estimate_for_composite_of_satellite_imagery(
         self,
@@ -89,12 +89,12 @@ class ClearSkyVisionAPI:
         Get Estimate for Processing Composite Satellite Imagery.
         """
         url = f"{self.BASE_URL}/api/satelliteimages/process/composite/estimate"
-        response = requests.post(url, headers=self.headers, data=query.json())
+        response = requests.post(url, headers=self.headers, data=query.model_dump_json())
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
 
-        return models.ProcessCompositeEstimateQueryResponseDto.parse_obj(response.json())
+        return models.ProcessCompositeEstimateQueryResponseDto.model_validate(response.json())
 
     def retrieve_composite_of_satellite_imagery(
         self,
@@ -119,7 +119,7 @@ class ClearSkyVisionAPI:
 
         url = f"{self.BASE_URL}/api/satelliteimages/process/composite"
         request_start = datetime.now()
-        with requests.post(url, headers=self.headers, data=command.json(), stream=True) as response:
+        with requests.post(url, headers=self.headers, data=command.model_dump_json(), stream=True) as response:
 
             if response.status_code == 401:
                 raise Exception("API Key is Unauthorized")
@@ -161,12 +161,12 @@ class ClearSkyVisionAPI:
         Get Models Available for Tasking.
         """
         url = f"{self.BASE_URL}/api/tasking/models"
-        response = requests.post(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers)
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
 
-        return models.TaskingModelsQueryResponseDto.parse_obj(response.json())
+        return models.TaskingModelsQueryResponseDto.model_validate(response.json())
 
     def get_tasking_orders(
         self,
@@ -183,7 +183,7 @@ class ClearSkyVisionAPI:
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
 
-        return models.TaskingOrdersQueryResponseDto.parse_obj(response.json())
+        return models.TaskingOrdersQueryResponseDto.model_validate(response.json())
 
     def search_orderable_tiles(
         self,
@@ -193,12 +193,30 @@ class ClearSkyVisionAPI:
         Search tiles available for Tasking Orders.
         """
         url = f"{self.BASE_URL}/api/tasking/search/tiles"
-        response = requests.post(url, headers=self.headers, json=query.dict())
+        response = requests.post(url, headers=self.headers, json=query.model_dump())
 
         if response.status_code == 401:
             raise Exception("API Key is Unauthorized")
 
-        return models.TaskingTileSearchQueryResponseDto.parse_obj(response.json())
+        return models.TaskingTileSearchQueryResponseDto.model_validate(response.json())
+
+    def retrieve_estimate_for_tasking_order(
+        self,
+        query: models.CreateTaskingOrderEstimateQueryAndCreateCommandDto,
+    ) -> Union[models.TaskingOrderEstimateQueryResponseDto, models.ServiceResultError]:
+        """
+        Get Estimate for Tasking Order.
+        """
+        url = f"{self.BASE_URL}/api/tasking/orders/estimate"
+        response = requests.post(url, headers=self.headers, data=query.model_dump_json())
+
+        if response.status_code == 401:
+            raise Exception("API Key is Unauthorized")
+
+        if response.status_code != 200:
+            return models.ServiceResultError(**response.json())
+
+        return models.TaskingOrderEstimateQueryResponseDto.model_validate(response.json())
 
     def cancel_recurring_order(
         self,
