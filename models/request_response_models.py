@@ -1,5 +1,5 @@
 """
-Collection of Request and Response models used by the ClearSky Vision API
+Collection of Request and Response models used by the ClearSKY Vision API
 """
 
 from typing import Dict, Generic, List, Optional, TypeVar, Union

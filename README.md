@@ -4,12 +4,12 @@
   <img alt="LOGO" src="https://clearsky.vision/wp-content/uploads/2020/09/cropped-clearsky_vision_logo_long402x-1.png">
 </picture>
 
-![ClearSky Vision](https://clearsky.vision/wp-content/uploads/2024/01/Github_beforeafter.png)
+![ClearSKY Vision](https://clearsky.vision/wp-content/uploads/2024/01/Github_beforeafter.png)
 
 **ClearSKY Vision**. The service delivers cloudless, multi-spectral Sentinel-2 (Level-2A) imagery. By harnessing a unique blend of data from multiple satellites, including Sentinel-1, Sentinel-2, Sentinel-3, and Landsat 8/9, and applying advanced deep learning techniques, we've successfully tackled the challenge of frequent cloud cover in traditional satellite images. The data product is comprised of estimations across 10 spectral bands from the [Sentinel-2 MultiSpectral Instrument (MSI)](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-2-msi/msi-instrument) Sensor. The cloudless imagery have many similarities to 'normal' Sentinel-2 and only deviate slightly to improve on the usability and accessibility of the data. 
 
 ## Table of Contents
-* [Why ClearSky Vision](#why-clearsky-vision)
+* [Why ClearSKY Vision](#why-clearsky-vision)
 * [Getting Started](#getting-started)
     * [Installation Instructions](#installation-instructions)
     * [API Credentials](#api-credentials)
@@ -29,7 +29,7 @@
 * [Additional Resources](#additional-resources)
 * [Frequently Asked Questions](#frequently-asked-questions)
 
-## Why ClearSky Vision
+## Why ClearSKY Vision
 At ClearSKY Vision, we are committed to transforming the landscape of Earth observation. Our mission is to revolutionize the accessibility and usability of satellite imagery, making it more relevant, immediate, and actionable. Our goal is to empower researchers, innovators, and decision-makers with precise and reliable optical imagery, unlocking new possibilities in environmental monitoring, resource management, and global awareness.
 
 This data source is unique due to the following features:
@@ -40,11 +40,11 @@ This data source is unique due to the following features:
 * An affordable source for up-to-date optical imagery.
 * Compatible with existing Sentinel-2 applications.
 
-![ClearSky Vision](https://clearsky.vision/wp-content/uploads/2024/01/Output2.png)
+![ClearSKY Vision](https://clearsky.vision/wp-content/uploads/2024/01/Output2.png)
 
 ## Getting Started
 
-This repository contains a python API wrapper for the [ClearSky Vision API](https://api.clearsky.vision/), as well as an example implementation for interacting with the API using the wrapper. Check out the wrapper [api_service.py](./api_service.py). It is assumed that a valid API key is available, if you do not have one check out [how to get a trial API key](#api-credentials). 
+This repository contains a python API wrapper for the [ClearSKY Vision API](https://api.clearsky.vision/), as well as an example implementation for interacting with the API using the wrapper. Check out the wrapper [api_service.py](./api_service.py). It is assumed that a valid API key is available, if you do not have one check out [how to get a trial API key](#api-credentials). 
 
 We also recommend checking out our documentation on [handling api errors](https://clearsky.vision/docs/api-error-codes/) and [api request limits](https://clearsky.vision/docs/api-request-limits/)
 
@@ -84,7 +84,7 @@ You can refer to the example API code for
 
 ### Acquiring User Credentials
 
-Request trial API credentials from **[ClearSky Vision](https://eo.clearsky.vision)** by clicking "GET API KEY". You will receive some trial credits immediately. Alternatively, contact **info@clearsky.vision** for manual access. You can use the API key [in the example implementation](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L44)
+Request trial API credentials from **[ClearSKY Vision](https://eo.clearsky.vision)** by clicking "GET API KEY". You will receive some trial credits immediately. Alternatively, contact **info@clearsky.vision** for manual access. You can use the API key [in the example implementation](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L44)
 
 ### Data Availability
 
@@ -123,7 +123,7 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g. QGIS)
 * Service Uptime ([uptime.clearsky.vision](https://uptime.clearsky.vision/))
 * Browse Imagery ([eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00))
 
-![ClearSky Vision](https://clearsky.vision/wp-content/uploads/2024/01/github_banner.png)
+![ClearSKY Vision](https://clearsky.vision/wp-content/uploads/2024/01/github_banner.png)
 
 ## Frequently Asked Questions
 

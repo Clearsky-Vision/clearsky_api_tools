@@ -1,5 +1,5 @@
 """
-Contains Service implementing the capabilities of the ClearSky Vision API
+Contains Service implementing the capabilities of the ClearSKY Vision API
 """
 
 from datetime import datetime
@@ -17,7 +17,7 @@ import models
 
 class ClearSkyVisionAPI:
     """
-    Service class representing the ClearSky Vision API.
+    Service class representing the ClearSKY Vision API.
     """
 
     BASE_URL = "https://api.clearsky.vision"
