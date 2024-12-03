@@ -21,11 +21,7 @@
     * [Requesting Estimated Credit Costs and Area](#requesting-estimated-credit-costs-and-area)
     * [Downloading a Satellite Image](#downloading-a-satellite-image)
     * [Visualizing Acquired Satellite Image](#visualizing-acquired-satellite-image)
-* [Python Scripts](#python-scripts)
-  * [Tile API Example](api_tools/example_tile_api.py)
-  * [Processing API Example](api_tools/examples_processing_api.py)
-* [Jupyter Notebooks](#jupyter-notebooks)
-    * [Processing API Example](notebook/Processing_API_Notebook.ipynb)
+* [Python Scripts And Tools](#python-scripts-and-tools)
 * [Additional Resources](#additional-resources)
 * [Frequently Asked Questions](#frequently-asked-questions)
 
@@ -108,7 +104,7 @@ You can refer to the example API code for [processing composite image for downlo
 
 The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g. QGIS) to visualize it. For a true-color image, select the B4, B3, and B2 bands (Red, Green, and Blue) and update the image symbology to stretch the band values (e.g. setting min to 0 and max to 2000) using `stretch to MinMax` contrast enhancement so the colors make sense.
 
-## Python Scripts & Tools
+## Python Scripts And Tools
 
 * [Example Code For Interacting with ClearSky API](./example_clearsky_api.py)
 * [Service Class Wrapping ClearSky API](./api_service.py)
