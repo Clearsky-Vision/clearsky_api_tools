@@ -186,10 +186,17 @@ class ProcessCompositeEstimateQueryResponseDto(ServiceResult[ProcessCompositeEst
 
 
 class ProcessCompositeCommandDto(ProcessCompositeEstimateQueryDto):
+    """
+    The `PixelSelectionMode` parameter controls which pixels are included:
+
+    Intersect: Includes all pixels that intersect the geometry (default).
+    Contained: Includes only pixels fully within the geometry.
+    """
+
     Date: date
-    PixelSelectionMode: str  # check api documentation for available options
-    SatelliteConstellations: List[str]  # check api documentation for available options
-    Model: str  # check api documentation for available options
+    PixelSelectionMode: str
+    SatelliteConstellations: List[str]  # check documentation for available options
+    Model: str  # check documentation for available options
     UtmGridForcePixelResolutionSize: bool  #
 
     model_config = {
@@ -234,16 +241,16 @@ class TaskingModelsQueryResponseDto(ServiceResult[TaskingModelsData]):
 class TaskOrderDto(BaseModel):
     TaskOrderGuid: str
     BillingCycle: str  # Monthly or Yearly
-    OrderingProcessStatus: str  # check api documentation for available options
+    OrderingProcessStatus: str  # check documentation for available options
     StorageMonths: int
     ApiRequests: int
     ImageFrequency: int
     TaskOrderAreaKm2: float
-    Model: str  # check api documentation for available options
+    Model: str  # check documentation for available options
     ReferenceDate: date
     From: date
     To: Optional[date]
-    SatelliteConstellations: List[str]  # check api documentation for available options
+    SatelliteConstellations: List[str]  # check documentation for available options
     Tiles: Optional[List[str]]
     Wkt: Optional[str]
 

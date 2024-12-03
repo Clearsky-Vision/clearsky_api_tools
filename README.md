@@ -13,16 +13,13 @@
 * [Getting Started](#getting-started)
     * [Installation Instructions](#installation-instructions)
     * [API Credentials](#api-credentials)
-    * [Data Specifications](#data-specifications)
-    * [Tile vs Processing API](#tile-vs-processing-api)
+    * [Data Specifications and Available Models](#data-specifications-and-available-models)
+    * [Tile vs Composite Ordering](#tile-vs-composite-ordering)
 * [Key Features](#key-features)
     * [Acquiring User Credentials](#acquiring-user-credentials)
-    * [Functions for 'Data Availability'](#functions-for-data-availability)
-    * [Requesting 'Data Availability'](#requesting-data-availability)
-    * [Functions for Estimating Credit Cost and Area](#functions-for-estimating-credit-cost-and-area)
+    * [Data Availability](#data-availability)
     * [Requesting Estimated Credit Costs and Area](#requesting-estimated-credit-costs-and-area)
-    * [Functions for Downloading Imagery](#functions-for-downloading-imagery)
-    * [Downloading a Single Satellite Image](#downloading-a-single-satellite-image)
+    * [Downloading a Satellite Image](#downloading-a-satellite-image)
     * [Visualizing Acquired Satellite Image](#visualizing-acquired-satellite-image)
 * [Python Scripts](#python-scripts)
   * [Tile API Example](api_tools/example_tile_api.py)
@@ -47,7 +44,9 @@ This data source is unique due to the following features:
 
 ## Getting Started
 
-This repository contains a python API wrapper for the ClearSky Vision API, as well as an example implementation for interacting with the API using the wrapper. Check out the wrapper [api_service.py](./api_service.py). It is assumed that a valid API key is available, if you do not have one check out [how to get a trial API key](#api-credentials)
+This repository contains a python API wrapper for the [ClearSky Vision API](https://api.clearsky.vision/), as well as an example implementation for interacting with the API using the wrapper. Check out the wrapper [api_service.py](./api_service.py). It is assumed that a valid API key is available, if you do not have one check out [how to get a trial API key](#api-credentials). 
+
+We also recommend checking out our documentation on [handling api errors](https://clearsky.vision/docs/api-error-codes/) and [api request limits](https://clearsky.vision/docs/api-request-limits/)
 
 For further details or support, contact **info@clearsky.vision**.
 
@@ -55,124 +54,66 @@ For further details or support, contact **info@clearsky.vision**.
 The project requirements are installed using [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.8-3.9 and 3.12 have been verified to work, but versions >= 3.8 should work assuming requirements install successfully. 
 
 ### API Credentials
-All API calls requires valid credentials which for testing purposes can be acquired from [eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get €125 worth of credits. The credentials will be sent to the provided email straight away. 
+All API calls requires valid credentials which for testing purposes can be acquired from [eo.clearsky.vision](https://eo.clearsky.vision/?view=50.637867,7.826911,5.77,0.00). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get some free credits. The credentials will be sent to the provided email straight away. 
 
 ![API KEY GIF](./get-trial-key.gif)
 
 Alternatively, you can ask for testing access by writing to info@clearsky.vision and get in contact with a human.
 
-### Data Specifications 
-The cloudless data has been corrected with Sen2Cor for bottom-of-atmosphere disturbance beforehand. All of our **Sentinel-2 data is harmonized to the [pre-January 25. baseline](https://sentinels.copernicus.eu/web/sentinel/-/copernicus-sentinel-2-major-products-upgrade-upcoming)**. This is to allow for more efficient time-series analysis across multiple years. The imagery is available as multi-spectral GeoTIFFs (.tif) with the following spectral bands:
+### Data Specifications and Available Models
+See our [data specification documentation](https://clearsky.vision/docs/data-specifications/) for information about the imagery. [Our available models](https://clearsky.vision/docs/available-models/) create images with the specified data specifications, some supporting more satellites than others. Each model has a number of mandatory satellites, as well as potential optional satellites that assist with keeping the images as up-to-date as possible.
 
-| **Band Name**      | **Band ID** |  **Resolution (m)**    |  **Wavelength (nm)**  |  **Band Order**    |
-|  :----     |    :----:   |     :----:  |    :----:  |      :----:  |
-| **Blue**      | B2       | 10   |    492 ± 33   |   1    |
-| **Green**      | B3        | 10      |    559 ± 18   |    2   |
-| **Red**      | B4       | 10   |   	664 ± 15    |    3   |
-| **Red-Edge 1**      | B5        | 10      |    704 ± 8   |    4   |
-| **Red-Edge 2**      | B6       | 10   |      	740 ± 7  |    5  |
-| **Red-Edge 3**      | B7        | 10      |     782 ± 10   |    6   |
-| **Near Infrared**       | B8       | 10   |    732 ± 53   |    7   |
-| **Narrow Near Infrared**      | B8a        | 10      |   864 ± 11  |    8   |
-| **Shortwave Infrared 1**     | B11       | 10   |   1613 ± 47  |    9   |
-| **Shortwave Infrared 2**    | B12        | 10      |  2200 ± 92  |    10   |
+### Tile vs Composite Ordering
 
-The API data is served in `int16` by default and the designated value for 'no data' is `-32768`. The reflectance scaling factor for spectral bands is `10000`, while for indices the values should be divided by 32767. All indices precomputed on our servers range from `-1` to `1`, if larger ranges are needed, we recommend that the user downloads the needed bands and then do the index calculation.
-
-Additional metadata tags have been integrated into GeoTIFF files retrieved through the Processing API:
-
-- "IMAGE_DATE": Represents the date of the image, formatted as "yyyymmdd".
-- "MODEL_VERSION": Indicates the version of the model used for prediction. This tag helps in monitoring significant updates made to the data.
-- "IMAGE_VERSION": Notifies users of any modifications to the image. If a tile is regenerated for any reason, this number increments by one.
-
-When a request overlaps multiple tiles, the "IMAGE_VERSION" and "MODEL_VERSION" tags will list values for each intersecting tile, separated by commas. The order of these values corresponds to the internal positioning of the tiles within our data storage, not by numerical sorting. For instance, if a request intersects four tiles, where three use model version 13 and the last uses model version 15, the "MODEL_VERSION" tag might display as "13,15,13,13". This arrangement ensures that any change in the data, such as a change in version from "13,15,13,13" to "13,15,13,15", indicates that the last tile in our internal sorting has been updated to version 15.
-
-
-### Tile vs Composite 
-
-* **Tile:** A ClearSky Vision tile is currently always 2621 km2 (5120x5120 px), based on a specific EPSG (e.g. EPSG:32632), and may contain no-data pixels `-32768` near shores or UTM zone transitions. 
-* **Composite:** You specify exactly the data you need. Composites can cut and merge tiles into custom bounding boxes (including single polygons and multipolygons), reproject coordinates, calculate indices ((A+B)/(A-B)), and/or downscale resolution. Its purpose is to deliver analysis-ready data in whatever format is required by the user. 
+Ordering satellite imagery data can be done either through tile ordering, or through composite ordering. See [a quick introduction to ordering](https://clearsky.vision/docs/tasking-order-introduction/) for details on how tiles and composites differ.
 
 As a rule of thumb, if the ratio between your area of interest and tile area is larger than that of the tile price vs composite price, you might want to order the Tiles rather than composites as it will be cheaper.
 
-Data ordered using tiles or composites will be accessible for a single download request using composite processing as of 2024-12-01, but there are plans TBD to require additional steps for processing composite downloads in areas using ordered tiles. Imagine asynchronous processing with polling of composite processing status rather than just waiting for a response with the imagery data for the request.
+Data ordered using tiles or composites will be accessible for a single download request using composite processing as of 2024-12-01, but there are plans (date TBD) to require additional steps for processing composite downloads in areas using ordered tiles. Imagine asynchronous processing with polling of composite processing status rather than just waiting for a response with the imagery data for the request.
 
+You can refer to the example API code for 
+* [searching orderable tiles](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L86)
+* [retrieving price estimates for orders](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L86)
+* [creating orders](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L142)
 
 ## Key Features:
 1. **Check data availability** in your Area of Interest (AOI).
-2. **Estimate area and credit costs** for the requested data.
+2. **Estimate download credit costs** for the requested data.
 3. **Download cloud-free Sentinel-2 imagery**.
 4. **Visualize acquired satellite imagery** for further analysis.
 
 ### Acquiring User Credentials
 
-Request trial API credentials from **[ClearSky Vision](https://eo.clearsky.vision)** by clicking "GET API KEY". You will receive €125 worth of credits immediately via email. Alternatively, contact **info@clearsky.vision** for manual access.
+Request trial API credentials from **[ClearSky Vision](https://eo.clearsky.vision)** by clicking "GET API KEY". You will receive some trial credits immediately. Alternatively, contact **info@clearsky.vision** for manual access. You can use the API key [in the example implementation](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L44)
 
-```python
-class User:
-    def __init__(self, api_key):
-        self.api_key = api_key
+### Data Availability
 
-credentials = User(api_key="XXXXXXXXXXXXXXXXXXXXXX")
-```
+To automate satellite data acquisition, it is useful to check if the imagery for the ordered area and date is available. Images created for each order are by default stored for the current month + 1 additional month, and additional storage months be added to each order.
 
-### Functions for 'Data Availability'
-
-To automate satellite data acquisition, it’s useful to check if the imagery for today is available. This avoids surprises, especially for large AOIs that may cross multiple tiles. The API call is free but requires an API key.
-
-Refer to the code from **`/api_tools/example_api.py`** (lines 30-60).
-
-```python
-<example code from file>
-```
-
-### Requesting 'Data Availability'
-
-The 'Data Availability' endpoint provides four key categories:
-- **IntersectedActiveZones**: `True` if tiles intersecting the AOI are found.
-- **FullyAvailable**: `True` if all intersecting tiles contain imagery for the requested date.
-- **PolygonInDataArea**: `True` if the AOI is in a data-accessible region.
-- **DataAvailableForUser**: `False` if access is restricted for the specified date/area.
-
-Refer to **`/api_tools/example_api.py`** (lines 70-80).
-
-```python
-<example code from file>
-```
+You can refer to the example API code for [searching available imagery](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L214) and [retrieving orders](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L157) to view the status of each order. These request do not consume any credits.
 
 ### Requesting Estimated Credit Costs and Area
 
-You can estimate the credit cost and area size before downloading imagery. The endpoint also provides processing time and file size. This call is free and requires the same parameters as a download request.
+You can estimate the download credit cost and area size before downloading imagery. This request is free and accepts the same parameters as a download request. By default each order allows for retrieving ordering imagery exactly once, but supports increasing the number of api requests to download imagery. You can refer to the example API code for [requesting composite image download estimates](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L185)
 
-Refer to **`/api_tools/example_api.py`** (lines 90-100).
-
-```python
-<example code from file>
-```
-
-### Downloading a Single Satellite Image
+### Downloading a Satellite Image
 
 The `PixelSelectionMode` parameter controls which pixels are included:
-- **Intersect**: Includes all pixels that intersect the bounding box (default).
-- **Contained**: Includes only pixels fully within the bounding box.
+- **Intersect**: Includes all pixels that intersect the geometry (default).
+- **Contained**: Includes only pixels fully within the geometry.
 
-Refer to **`/api_tools/example_api.py`** (lines 110-140).
-
-```python
-<example code from file>
-```
+You can refer to the example API code for [processing composite image for download](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L253)
 
 ### Visualizing Acquired Satellite Image
 
-The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS) to visualize it. For a true-color image, select the B4, B3, and B2 bands (Red, Green, and Blue).
-
----
+The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g. QGIS) to visualize it. For a true-color image, select the B4, B3, and B2 bands (Red, Green, and Blue) and update the image symbology to stretch the band values (e.g. setting min to 0 and max to 2000) using `stretch to MinMax` contrast enhancement so the colors make sense.
 
 ## Python Scripts & Tools
 
 * [Example Code For Interacting with ClearSky API](./example_clearsky_api.py)
 * [Service Class Wrapping ClearSky API](./api_service.py)
-* [Tool for buffering request polygon](./tools/utm_boundingbox_to_wgs84.py)
+* [Tool for buffering a bounding box for intersect/contains pixel selection](./tools/utm_boundingbox_to_wgs84.py)
+* [Tool for wrapping a wkt within a GeometryCollection as required by tasking orders](./tools/geometrycollection_wrapper.py)
 
 ## Additional Resources
 
@@ -186,22 +127,26 @@ The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS
 
 ## Frequently Asked Questions
 
-* ***Why is the service not available in my area?***
-    * The service is time-consuming and expensive to run as a small startup, so if imagery in an area is likely to be unused it will not be generated until it is in demand. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (info@clearsky.vision). All new areas start out with testing and free data sharing. You will get plenty of opportunities to test the imagery in your applications. 
+* ***Is the service available in my area?***
+    * The service generally allows for generating cloudless sentinel-2 imagery globally, but some areas have not yet been validated for quality. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (info@clearsky.vision). All new areas start out with testing and free data sharing to ensure the data quality is up to par. You will get plenty of opportunities to test the imagery in your applications. 
 * ***What does synthetic data mean and can I trust it?***
-    * The data available on eo.clearsky.vision is derived from deep neural networks. This is the only way to extract the necessary information available in the images. We call images derived from this process ‘synthetic’ as to not mislead users about the origin of the data. This also includes natural cloud-free data from Sentinel-2, as this data is still being processed by an artificial intelligence to ensure consistency among other things. The imagery, however, is designed to mimic normal Sentinel-2 imagery minus a few undesirable traits. The imagery you will find here looks and feels like Sentinel-2, and can be swapped in-place in pipelines already using the original Sentinel-2 imagery. If you would like to know more about our testing methods or accuracy, feel free to reach out at info@clearsky.vision.
-* ***Is there any difference between today's data and historical data?***
-    * No, all data has been produced in the same way. This is to ensure consistency throughout our service. However, this also means historical data is produced without any future insights and it’s only backward-looking. It will not interpolate between the date and what we know it will become in the future because it will not ingest future data even if it is available. We only extrapolate given historical data using multiple satellites what a likely clean image looks like.
+    * The sentinel-2 imagery data we generate is derived from deep neural networks. This is the only way to extract the necessary information available in the imagery from multiple satellite constellations. We call images derived from this process ‘synthetic’ as to not mislead users about the origin of the data. This also includes natural cloud-free data from Sentinel-2, as this data is still being processed by an artificial intelligence to ensure consistency among other things. The imagery, however, is designed to mimic normal Sentinel-2 imagery minus a few undesirable traits (clouds, shadows, missing area coverage, ...). The imagery you will find here looks and feels like Sentinel-2, and can be swapped in-place in pipelines already using the original Sentinel-2 imagery. If you would like to know more about our testing methods or accuracy, feel free to reach out at info@clearsky.vision.
+* ***Is there any difference between today's data and historical data? Do you use images from the future when generating historic images?***
+    * No, all data has been produced in the same way. This is to ensure consistency throughout our service. However, this also means historical data is produced without any future insights and it is only backward-looking. Our models will not interpolate between the historic date and what we know it will become in the future because they will not ingest future data even if it is available. We only extrapolate from the available historic data, from the multiple satellites we can use, what a clean image looks like.
 * ***Can I access water imagery through this service?***
-    * No. This is developed for land-based monitoring and most of open water bodies are removed after the images have been created. We do not store SAR data for open seas and it’s not recommended to use any unremoved water imagery that you might find on the platform. You can find lakes consistently in our imagery, however, all water data is considerably lower quality than our land-based imagery. The recommended use of this platform (and all imagery available) is for continuous monitoring of land-based areas of interest. It has been developed with vegetation monitoring in mind. 
-* ***I'm receiving error code 401, what does that mean?***
-    * It means unauthorized access to our services which is often due to missing or incorrect API credentials. 
-* ***I'm receiving error code 1002, what does that mean?***
-    * It means there is no data available for the area and/or date requested. This can be due to us not supporting the area or not having produced data for that particular day. Try another day in the same area or write to info@clearsky.vision to hear about the possibilites for extending the service area. 
+    * Partially. This is developed for land-based monitoring and most of open water bodies are removed after the images have been created. We do not store SAR data for open seas and it is not recommended to use any unremoved water imagery that you might find on the platform. You can find lakes consistently in our imagery, however, all water data is considerably lower quality than our land-based imagery. The recommended use of this platform (and all imagery available) is for continuous monitoring of land-based areas of interest. It has been developed with this in mind. 
+* ***I'm receiving error code 500, 400, 401, or other error codes. what do they mean?***
+    * [check out our error handling documentation](https://clearsky.vision/docs/api-error-codes/)
+* ***How does billing work?***
+    * [check out the billing documentation](https://clearsky.vision/docs/subscription-and-billing/)
+* ***What do you mean by credits?***
+    * [read this to understand our credit system](https://clearsky.vision/docs/understand-credit-system/)
+* ***I cannot update an existing order with a new small area?***
+    * Orders have some limitations, check out [our order guide](https://clearsky.vision/docs-category/order/)
 
 ## Change Log
 
-* Updated on 2024/12/02 - showcase tasking with extended examples
+* Updated on 2024/12/03 - showcase tasking with extended examples, update relevant documentation
 * Updated on 2024/02/07
 
 Contact us at info@clearsky.vision for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.
