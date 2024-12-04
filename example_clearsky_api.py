@@ -139,7 +139,7 @@ def main():
     #                          Tasking Order Creation                         #
     ############################## ------------- ##############################
 
-    if execute_endpoints_requiring_credits:
+    if not execute_endpoints_requiring_credits:
         print("skipping creation of task order due to execute_endpoints_requiring_credits not being set")
     else:
         create_tasking_order_result = api_service.create_tasking_order(tasking_estimate_dto)
@@ -250,7 +250,7 @@ def main():
     #                    Composite Processing & Download                      #
     ############################## ------------- ##############################
 
-    if execute_endpoints_requiring_credits:
+    if not execute_endpoints_requiring_credits:
         print("skipping download of imagery due to execute_endpoints_requiring_credits not being set")
     else:
         composite_dtos: List[models.ProcessCompositeCommandDto] = []
@@ -282,9 +282,9 @@ def main():
 
         for index, composite_result in process_composite_results.items():
 
-            failed = not isinstance(composite_result[1], str) or not composite_result[1].Succeeded
+            composite_succeeded = isinstance(composite_result[1], str) or composite_result[1].Succeeded
 
-            if failed:
+            if not composite_succeeded:
                 print(f"process composite job {index} failed: " + str(composite_result[1].Error.Message))
                 continue
 
