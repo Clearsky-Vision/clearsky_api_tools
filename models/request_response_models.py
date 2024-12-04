@@ -23,7 +23,6 @@ class ServiceResult(BaseModel, Generic[T]):
     @field_validator("Data", mode="before")
     @classmethod
     def validate_data(cls, value, info):
-        # Retrieve the generic type from __generic_type__, fallback to __parameters__
         generic_type = getattr(cls, "__generic_type__", None)
         if generic_type is None and hasattr(cls, "__parameters__"):
             parameters = cls.__parameters__  # type: ignore
@@ -90,6 +89,8 @@ class ApiKeyData(BaseModel):
     MaxConcurrentConnections: int
     MaxCompositeAreaKm2: int
     MaxTotalBands: int
+    CurrentMonthCosts: float
+    NextMonthCosts: float
 
 
 class ApiKeyInfoQueryResponseDto(ServiceResult[ApiKeyData]):
@@ -298,10 +299,10 @@ class CreateTaskingOrderEstimateQueryAndCreateCommandDto(BaseModel):
 
 class TaskingOrderEstimateCostsDto(BaseModel):
     CurrencyCode: str
-    HistoricOrderCostEstimate: float
-    HistoricStorageCosts: float
-    RecurringOrderCostEstimate: float
-    RecurringStorageCosts: float
+    CurrentMonthOrderCostEstimate: float
+    CurrentMonthStorageCosts: float
+    NextMonthOrderCostEstimate: float
+    NextMonthStorageCosts: float
 
 
 class TaskingOrderEstimateQueryResponseData(BaseModel):
@@ -311,14 +312,13 @@ class TaskingOrderEstimateQueryResponseData(BaseModel):
     CancellationDate: date
     AreaKm2: float
     AreaKm2BeforeMinimum1Km2PerAoi: float  # The Area of AoIs following the rule of AoI must be minimum 1 km2
-    TotalHistoricCost: float
-    NextMonthRecurringCost: float
+    CurrentMonthCost: float
+    NextMonthCost: float
     Costs: TaskingOrderEstimateCostsDto
     Tiles: Optional[List[str]]
-    AreasOfInterestWkt: str
+    AreasOfInterestWkt: str  # the input GeometryCollection converted to bounding boxes used for the order
     SatelliteConstellations: List[str]  # check api documentation for available options
-    HistoricImageDates: List[date]
-    RecurringImageDates: List[date]
+    ImageDates: List[date]
 
 
 class TaskingOrderEstimateQueryResponseDto(ServiceResult[TaskingOrderEstimateQueryResponseData]):
