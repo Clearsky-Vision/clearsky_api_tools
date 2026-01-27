@@ -6,13 +6,13 @@ BASE_URL = os.getenv("CLEARSKY_BASE_URL", "https://api.clearsky.vision")
 
 ACCEPT_ESTIMATE = False # Set to True to accept the estimate
 
+client = ClearSkyClient(api_key=API_KEY, base_url=BASE_URL)
+
 WKT_GEOMETRYCOLLECTION = (
     "GEOMETRYCOLLECTION ("
     "POLYGON ((9.563103 50.703336, 9.730644 50.703336, 9.730644 50.80759, 9.563103 50.80759, 9.563103 50.703336))"
     ")"
 )
-
-client = ClearSkyClient(api_key=API_KEY, base_url=BASE_URL)
 
 estimate = client.estimate_task_order(
     wkt=WKT_GEOMETRYCOLLECTION,
@@ -23,7 +23,7 @@ estimate = client.estimate_task_order(
     image_frequency=2,
     reference_date="2024-01-01",
     from_date="2025-06-01",
-    to_date="2025-06-31",
+    to_date="2025-06-30",
 )
 
 print(format_order_estimate(estimate))

@@ -9,13 +9,34 @@ from typing import Any, Dict, Optional
 
 import requests
 
+def _pretty(obj: Any) -> str:
+    try:
+        return json.dumps(obj, indent=2, ensure_ascii=False, sort_keys=True)
+    except Exception:
+        return repr(obj)
 
 class ClearSkyAPIError(RuntimeError):
-    def __init__(self, message: str, code: Optional[int] = None, status_code: Optional[int] = None):
+    def __init__(
+        self,
+        message: str,
+        code: Optional[int] = None,
+        status_code: Optional[int] = None,
+        *,
+        details: Any = None,
+    ):
         self.code = code
         self.status_code = status_code
-        super().__init__(f"{message}" + (f" (code={code})" if code is not None else "") + (f" (http={status_code})" if status_code else ""))
+        self.details = details
 
+        msg = f"{message}"
+        if code is not None:
+            msg += f" (code={code})"
+        if status_code is not None:
+            msg += f" (http={status_code})"
+        if details is not None:
+            msg += "\n\n--- Error details ---\n" + _pretty(details)
+
+        super().__init__(msg)
 
 @dataclass
 class ClearSkyClient:
@@ -105,45 +126,74 @@ class ClearSkyClient:
                 stream=stream,
             )
 
-            # Basic retry policy for transient failures / throttling
+            # Retry policy
             if resp.status_code in (429, 500, 502, 503, 504) and attempt < self.max_retries - 1:
                 time.sleep(self.backoff_s * (2 ** attempt))
                 continue
 
-            # Success path
+            ct = (resp.headers.get("Content-Type") or "").lower()
+            is_json = "application/json" in ct
+
+            # ---------- Success path ----------
             if 200 <= resp.status_code < 300:
-                # If expecting JSON "ServiceResult", validate it here
-                if not expect_binary:
-                    ct = (resp.headers.get("Content-Type") or "").lower()
-                    if "application/json" in ct:
-                        payload = resp.json()
-                        # Many endpoints return ServiceResult{Succeeded,Data,Error}
-                        if isinstance(payload, dict) and "Succeeded" in payload:
-                            if not payload.get("Succeeded", False):
-                                err = payload.get("Error") or {}
-                                raise ClearSkyAPIError(
-                                    message=err.get("Message", "Request failed"),
-                                    code=err.get("Code"),
-                                    status_code=resp.status_code,
-                                )
+                if not expect_binary and is_json:
+                    payload = resp.json()
+                    # ServiceResult{Succeeded,Data,Error}
+                    if isinstance(payload, dict) and "Succeeded" in payload:
+                        if not payload.get("Succeeded", False):
+                            err = payload.get("Error") or {}
+                            data = payload.get("Data")
+                            raise ClearSkyAPIError(
+                                message=err.get("Message", "Request failed"),
+                                code=err.get("Code"),
+                                status_code=resp.status_code,
+                                details={
+                                        "Error": err,
+                                        "Data": data,  
+                                    },  
+                            )
                 return resp
 
-            # Error path: try parse ServiceResult error if JSON
-            try:
-                ct = (resp.headers.get("Content-Type") or "").lower()
-                if "application/json" in ct:
+            # ---------- Error path ----------
+            if is_json:
+                try:
                     payload = resp.json()
-                    if isinstance(payload, dict) and "Error" in payload:
-                        err = payload.get("Error") or {}
-                        raise ClearSkyAPIError(
-                            message=err.get("Message", resp.text),
-                            code=err.get("Code"),
-                            status_code=resp.status_code,
-                        )
-                raise ClearSkyAPIError(resp.text, status_code=resp.status_code)
-            except ValueError:
-                # Non-JSON error
-                raise ClearSkyAPIError(resp.text, status_code=resp.status_code)
+                except ValueError:
+                    payload = None
+
+                # Case 1: ClearSky ServiceResult error envelope
+                if isinstance(payload, dict) and "Error" in payload:
+                    err = payload.get("Error") or {}
+                    data = payload.get("Data")
+                    raise ClearSkyAPIError(
+                        message=err.get("Message", resp.text),
+                        code=err.get("Code"),
+                        status_code=resp.status_code,
+                        details={
+                            "Error": err,
+                            "Data": data,  # <-- include Data here too
+                        },
+                    )
+
+                # Case 2: ASP.NET style validation errors:
+                # { "title": "...", "status": 400, "errors": { "Field": ["..."] }, "traceId": "..." }
+                if isinstance(payload, dict) and ("errors" in payload or "traceId" in payload or "title" in payload):
+                    msg = payload.get("title") or payload.get("message") or "Request failed"
+                    raise ClearSkyAPIError(
+                        message=msg,
+                        status_code=resp.status_code,
+                        details=payload.get("errors") or payload,  # <-- show actual field errors
+                    )
+
+                # Fallback: show whatever JSON we got
+                raise ClearSkyAPIError(
+                    message=resp.text or "Request failed",
+                    status_code=resp.status_code,
+                    details=payload,
+                )
+
+            # Non-JSON error fallback
+            raise ClearSkyAPIError(resp.text or "Request failed", status_code=resp.status_code)
 
         raise ClearSkyAPIError("Request failed after retries")
 
@@ -405,6 +455,13 @@ class ClearSkyClient:
         if automatic_order_guid is not None:
             params["automaticOrderGuid"] = automatic_order_guid
 
+        wkt, geojson, tile_guids, minitile_guids = self._normalize_order_selector(
+            wkt=wkt,
+            geojson=geojson,
+            tile_guids=tile_guids,
+            minitile_guids=minitile_guids,
+        )
+
         body = {
             "Wkt": wkt,
             "GeoJson": geojson,
@@ -462,6 +519,29 @@ class ClearSkyClient:
         """
         resp = self._request("GET", "/api/tasking/orders", params={"recurringOnly": recurring_only, "getExpired": get_expired})
         return resp.json()["Data"]
+    
+    def _normalize_order_selector(
+    self,
+    *,
+    wkt: Optional[str],
+    geojson: Optional[Dict[str, Any]],
+    tile_guids: Optional[list[str]],
+    minitile_guids: Optional[list[str]],
+) -> tuple[Optional[str], Optional[Dict[str, Any]], Optional[list[str]], Optional[list[str]]]:
+        has_geom = (wkt is not None) or (geojson is not None)
+        has_tiles = bool(tile_guids) or bool(minitile_guids)  # only True if lists are non-empty
+
+        if has_geom and has_tiles:
+            raise ValueError("Provide either Wkt/GeoJson OR TileGuids/MiniTileGuids (not both).")
+        if not has_geom and not has_tiles:
+            raise ValueError("You must provide either Wkt/GeoJson OR at least one TileGuid/MiniTileGuid.")
+
+        if has_geom:
+            # Geometry order => do NOT send tile lists
+            return wkt, geojson, None, None
+
+        # Tile order => do NOT send geometry
+        return None, None, tile_guids, minitile_guids
 
     def order_details(self, guids: list[str]) -> Dict[str, Any]:
         """Get detailed information for specific tasking orders by GUID.
@@ -844,6 +924,14 @@ class ClearSkyClient:
         """
         if satellite_constellations is None:
             satellite_constellations = ["Sentinel1", "Sentinel2", "Landsat89"]
+
+        wkt, geojson, tile_guids, minitile_guids = self._normalize_order_selector(
+            wkt=wkt,
+            geojson=geojson,
+            tile_guids=tile_guids,
+            minitile_guids=minitile_guids,
+        )
+
 
         body: Dict[str, Any] = {
             "Wkt": wkt,
