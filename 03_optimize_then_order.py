@@ -3,31 +3,38 @@ from clearsky_client import ClearSkyClient, format_order_estimate
 
 API_KEY = os.environ["CLEARSKY_API_KEY"]
 BASE_URL = os.getenv("CLEARSKY_BASE_URL", "https://api.clearsky.vision")
-ACCEPT_ESTIMATE = False # Set to True to accept the estimate
+ACCEPT_ESTIMATE = True # Set to True to accept the estimate
 
 WKT_GEOMETRYCOLLECTION = (
     "GEOMETRYCOLLECTION ("
-    "POLYGON ((9.877893206725581 56.47856668238974, 10.196496722350581 56.47856668238974, "
-    "10.196496722350581 56.27782087776097, 9.877893206725581 56.27782087776097, "
-    "9.877893206725581 56.47856668238974))"
+    "POLYGON ((9.563103 50.703336, 9.730644 50.703336, 9.730644 50.80759, 9.563103 50.80759, 9.563103 50.703336))"
     ")"
 )
+
+model="Stratus2"
+satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"]
+storage_months=1
+api_requests=1
+image_frequency=2
+reference_date="2024-01-01"
+from_date="2025-06-01"
+to_date="2025-06-30"
 
 client = ClearSkyClient(api_key=API_KEY, base_url=BASE_URL)
 
 opt = client.optimize_tiles(WKT_GEOMETRYCOLLECTION)
-tile_guids = opt.get("Tiles", [])
-minitile_guids = opt.get("MiniTiles", [])
+tile_guids = opt.get("Tiles", None)
+minitile_guids = opt.get("MiniTiles", None)
 
 estimate = client.estimate_task_order(
     tile_guids=tile_guids,
     minitile_guids=minitile_guids,
-    model="Stratus2",
-    satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"],
-    storage_months=3,
-    api_requests=5,
-    from_date="2024-01-01",
-    to_date=None,
+    model=model,
+    satellite_constellations=satellite_constellations,
+    storage_months=storage_months,
+    api_requests=api_requests,
+    from_date=from_date,
+    to_date=to_date,
 )
 
 print(format_order_estimate(estimate))
@@ -38,12 +45,12 @@ if not ACCEPT_ESTIMATE:
 order = client.create_task_order(
     tile_guids=tile_guids,
     minitile_guids=minitile_guids,
-    model="Stratus2",
-    satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"],
-    storage_months=3,
-    api_requests=5,
-    from_date="2024-01-01",
-    to_date=None,
+    model=model,
+    satellite_constellations=satellite_constellations,
+    storage_months=storage_months,
+    api_requests=api_requests,
+    from_date=from_date,
+    to_date=to_date,
 )
 
 print("Created order:", order["TaskOrderGuid"])

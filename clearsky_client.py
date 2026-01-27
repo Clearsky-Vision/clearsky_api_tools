@@ -5,7 +5,7 @@ import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import requests
 
@@ -524,9 +524,13 @@ class ClearSkyClient:
     geojson: Optional[Dict[str, Any]],
     tile_guids: Optional[list[str]],
     minitile_guids: Optional[list[str]],
-) -> tuple[Optional[str], Optional[Dict[str, Any]], Optional[list[str]], Optional[list[str]]]:
+) -> Tuple[Optional[str], Optional[Dict[str, Any]], Optional[list[str]], Optional[list[str]]]:
+        # Treat empty lists as "not provided"
+        tile_guids = tile_guids or None
+        minitile_guids = minitile_guids or None
+
         has_geom = (wkt is not None) or (geojson is not None)
-        has_tiles = bool(tile_guids) or bool(minitile_guids)  # only True if lists are non-empty
+        has_tiles = (tile_guids is not None) or (minitile_guids is not None)
 
         if has_geom and has_tiles:
             raise ValueError("Provide either Wkt/GeoJson OR TileGuids/MiniTileGuids (not both).")
@@ -1144,7 +1148,6 @@ def format_order_estimate(est: dict) -> str:
     Output fields shown
     -------------------
     - Area (``AreaKm2``) when available
-    - CancellationDate when present
     - CurrentMonthCosts total and currency when present
     - RecurringCostsEstimate total and currency when present
     - ImageDates count and first/last when present
@@ -1165,15 +1168,12 @@ def format_order_estimate(est: dict) -> str:
     total_rec = money(rec, "TotalCost", "TotalCostEuro")
 
     area = est.get("AreaKm2")
-    cancel = est.get("CancellationDate")
     img_dates = est.get("ImageDates") or []
 
     lines = []
     lines.append("=== Tasking Order Estimate ===")
     if area is not None:
         lines.append(f"AreaKm2: {area}")
-    if cancel:
-        lines.append(f"CancellationDate: {cancel}")
     if total_now is not None:
         lines.append(f"CurrentMonth Total: {total_now} {currency}")
     if total_rec is not None:
