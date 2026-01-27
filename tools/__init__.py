@@ -1,2 +1,0 @@
-from tools.geometrycollection_wrapper import wrap_in_geometrycollection
-from tools.geometry_area_calculator import calculate_area_ratio

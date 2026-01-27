@@ -6,22 +6,24 @@
 
 ![ClearSKY Vision Banner](https://clearsky.vision/images/other/BeforeAfterBanner.png)
 
-**ClearSKY Vision**. The service delivers cloudless, multi-spectral Sentinel-2 (Level-2A) imagery. By harnessing a unique blend of data from multiple satellites, including Sentinel-1, Sentinel-2, Sentinel-3, and Landsat 8/9, and applying advanced deep learning techniques, we've successfully tackled the challenge of frequent cloud cover in traditional satellite images. The data product is comprised of estimations across 10 spectral bands from the [Sentinel-2 MultiSpectral Instrument (MSI)](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-2-msi/msi-instrument) Sensor. The cloudless imagery have many similarities to 'normal' Sentinel-2 and only deviate slightly to improve on the usability and accessibility of the data. 
+**ClearSKY Vision** delivers cloudless, multi-spectral Sentinel-2 (Level-2A) imagery. By harnessing a unique blend of data from multiple satellites, including Sentinel-1, Sentinel-2, Sentinel-3, and Landsat 8/9, and applying advanced deep learning techniques, we've successfully tackled the challenge of frequent cloud cover in traditional satellite images. The data product is comprised of estimations across 10 spectral bands from the [Sentinel-2 MultiSpectral Instrument (MSI)](https://sentinels.copernicus.eu/web/sentinel/technical-guides/sentinel-2-msi/msi-instrument) sensor. The cloudless imagery has many similarities to “normal” Sentinel-2 and only deviates slightly to improve usability and accessibility.
 
 ## Table of Contents
 * [Why ClearSKY Vision](#why-clearsky-vision)
 * [Getting Started](#getting-started)
-    * [Installation Instructions](#installation-instructions)
-    * [API Credentials](#api-credentials)
-    * [Data Specifications and Available Models](#data-specifications-and-available-models)
-    * [Tile vs Composite Ordering](#tile-vs-composite-ordering)
+  * [Installation Instructions](#installation-instructions)
+  * [API Credentials](#api-credentials)
+  * [Authentication](#authentication)
+  * [Data Specifications and Available Models](#data-specifications-and-available-models)
+  * [Tile vs Composite Ordering](#tile-vs-composite-ordering)
 * [Key Features](#key-features)
-    * [Acquiring User Credentials](#acquiring-user-credentials)
-    * [Data Availability](#data-availability)
-    * [Requesting Estimated Credit Costs and Area](#requesting-estimated-credit-costs-and-area)
-    * [Downloading a Satellite Image](#downloading-a-satellite-image)
-    * [Visualizing Acquired Satellite Image](#visualizing-acquired-satellite-image)
-* [Python Scripts And Tools](#python-scripts-and-tools)
+  * [Estimate price before ordering](#estimate-price-before-ordering)
+  * [Create orders](#create-orders)
+  * [Order status](#order-status)
+  * [Data availability](#data-availability)
+  * [Downloading data](#downloading-data)
+  * [Visualizing acquired satellite imagery](#visualizing-acquired-satellite-imagery)
+* [Python Client and Examples](#python-client-and-examples)
 * [Additional Resources](#additional-resources)
 * [Frequently Asked Questions](#frequently-asked-questions)
 
@@ -30,9 +32,9 @@ At ClearSKY Vision, we are committed to transforming the landscape of Earth obse
 
 This data source is unique due to the following features:
 * Gain access to frequent cloudless multi-spectral imagery.
-* Leverage the capabilities of seven satellites, while focusing operations on just one.
+* Leverage the capabilities of multiple satellites, while focusing operations on a single, consistent output product.
 * No need for cloud and shadow masks as there are none.
-* Easy to use time-series data without any missing values.
+* Easy-to-use time-series data without missing values.
 * An affordable source for up-to-date optical imagery.
 * Compatible with existing Sentinel-2 applications.
 
@@ -40,97 +42,180 @@ This data source is unique due to the following features:
 
 ## Getting Started
 
-This repository contains a python API wrapper for the [ClearSKY Vision API](https://api.clearsky.vision/), as well as an example implementation for interacting with the API using the wrapper. Check out the wrapper [api_service.py](./api_service.py). It is assumed that a valid API key is available, if you do not have one check out [how to get a trial API key](#api-credentials). 
+This repository contains:
+- A lightweight Python client: **[`clearsky_client.py`](./clearsky_client.py)**
+- A set of runnable scripts under **[`examples/`](./examples/)** showing the typical end-to-end workflow:
+  - estimate price → create order → check status/availability → download
 
-We also recommend checking out our documentation on [handling api errors](https://docs.clearsky.vision/docs/api-guide/error-codes) and [api request limits](https://docs.clearsky.vision/docs/api-guide/request-limits)
+We also recommend reading:
+- API error codes: https://docs.clearsky.vision/docs/api-guide/error-codes
+- API request limits: https://docs.clearsky.vision/docs/api-guide/request-limits
 
 For further details or support, contact **info@clearsky.vision**.
 
 ### Installation Instructions
-The project requirements are installed using [pip install -r ./requirements.txt](./requirements.txt). tqdm is an optional requirement used to visualize download progress. Python 3.8-3.9 and 3.12 have been verified to work, but versions >= 3.8 should work assuming requirements install successfully. 
+
+This repo’s examples use `requests`. Install dependencies either via `requirements.txt` or directly:
+
+```bash
+pip install -r requirements.txt
+# or
+pip install requests
+```
+
+Python 3.8+ recommended.
 
 ### API Credentials
-All API calls requires valid credentials which for testing purposes can be acquired from [order.clearsky.vision](https://order.clearsky.vision/login.html). You can request credentials from eo.clearsky.vision by clicking "GET API KEY" and get some free credits. The credentials will be sent to the provided email straight away. 
 
-Alternatively, you can ask for testing access by writing to info@clearsky.vision and get in contact with a human.
+All API calls require valid credentials. You can acquire an API key from:
+- https://dashboard.clearsky.vision/ (create a user and an API key)
+
+Alternatively, you can request access by writing to **info@clearsky.vision** and get in contact with a human.
+
+### Authentication
+
+Authentication is done via an API key sent in the request header:
+
+- Header name: `X-API-KEY`
+- The Python client automatically attaches this header for every request.
+
+Recommended environment variables:
+
+```bash
+export CLEARSKY_API_KEY="YOUR_API_KEY"
+export CLEARSKY_BASE_URL="https://api.clearsky.vision"   # optional (default shown)
+```
 
 ### Data Specifications and Available Models
-See our [data specification documentation](https://docs.clearsky.vision/docs/data-models/data-specs) for information about the imagery. [Our available models](https://docs.clearsky.vision/docs/data-models/fusion-models) create images with the specified data specifications, some supporting more satellites than others. Each model has a number of mandatory satellites, as well as potential optional satellites that assist with keeping the images as up-to-date as possible.
+
+See our data specification documentation for information about the imagery:
+- https://docs.clearsky.vision/docs/data-models/data-specs
+
+Models define how imagery is fused and which satellites are supported:
+- https://docs.clearsky.vision/docs/data-models/fusion-models
+
+You can also discover available models programmatically via the API (and via the corresponding example scripts).
 
 ### Tile vs Composite Ordering
 
-Ordering satellite imagery data can be done either through tile ordering, or through composite ordering. See [a quick introduction to ordering](https://docs.clearsky.vision/docs/order-guide/order-introduction) for details on how tiles and composites differ. As a rule of thumb, if the ratio between your area of interest and tile area is larger than that of the tile price vs composite price, you might want to order the Tiles rather than composites as it will be cheaper.
+Ordering satellite imagery data can be done through **composite ordering** (AOI-based) or **tile/minitile ordering** (GUID-based). See our ordering docs for details:
+- https://docs.clearsky.vision/docs/order-guide/order-introduction
 
-Data ordered using tiles or composites will be accessible for a single download request using composite processing as of 2024-12-01, but there are plans (date TBD) to require additional steps for processing composite downloads in areas using ordered tiles. Imagine asynchronous processing with polling of composite processing status rather than just waiting for a response with the imagery data for the request.
+In general:
+- **Composite ordering** is convenient when you want to manage small and irregular areas.
+- **Tile/minitile ordering** is cost-effective when your AOI aligns well with tile coverage.
+- You can also request a **price-optimized tile selection** for a WKT GeometryCollection using the tile optimization endpoint and then create a tile/minitile order from the returned GUIDs.
+- Mini-tile orders have a default 50% rebate compared to composite orders, meaning that if your usage requires more than 50% of a mini-tile it is more cost effecient to order the mini-tile than doing a composite order in the area. Tiles have a base rebate of 80%, meaning that if you require more than 40% of a tile it makes sense to buy the full tile instead of minitiles.
 
-You can refer to the example API code for 
-* [Searching orderable tiles](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L86)
-* [Retrieving price estimates for orders](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L86)
-* [Creating orders](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L142)
+> **Important:** Always estimate the price of an order **before** creating it, and require user acceptance of the estimated cost.
 
-## Key Features:
-1. **Check data availability** in your Area of Interest (AOI).
-2. **Estimate download credit costs** for the requested data.
-3. **Download cloud-free Sentinel-2 imagery**.
-4. **Visualize acquired satellite imagery** for further analysis.
+Once an area is ordered, availability and downloads follow a consistent pattern:
+- You can check **order status** for all orders or a specific order.
+- You can check **availability** for a specific date/AOI (even when availability depends on multiple different orders).
+- You can download a **composite** for an AOI regardless of whether the underlying order is tile-based or composite-based.
 
-### Acquiring User Credentials
+---
 
-Request trial API credentials from **[order.clearsky.vision](https://order.clearsky.vision/login.html)** by clicking "Create API Key". You will receive some trial credits immediately. Alternatively, contact **info@clearsky.vision** for manual access. You can use the API key [in the example implementation](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L44)
+## Key Features
 
-### Data Availability
+### Estimate price before ordering
 
-To automate satellite data acquisition, it is useful to check if the imagery for the ordered area and date is available. Images created for each order are by default stored for the current month + 1 additional month, and additional storage months be added to each order.
+Before creating an order, use the **task order estimate** endpoint to preview costs and the effective coverage/dates. The estimate should be shown to the user and accepted before order creation.
 
-You can refer to the example API code for [searching available imagery](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L214) and [retrieving orders](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L157) to view the status of each order. These request do not consume any credits.
+See: the ordering examples in [`examples/python/1_ordering/`](./examples/python/1_ordering/).
 
-### Requesting Estimated Credit Costs and Area
+### Create orders
 
-You can estimate the download credit cost and area size before downloading imagery. This request is free and accepts the same parameters as a download request. By default each order allows for retrieving ordering imagery exactly once, but supports increasing the number of api requests to download imagery. You can refer to the example API code for [requesting composite image download estimates](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L185)
+There are multiple ordering flows:
+1. Create a composite-area order directly from an AOI geometry, **or**
+2. Search tiles/minitiles and create a tile/minitile order, **or**
+3. Use tile optimization to get a cost-effective coverage for a WKT GeometryCollection, then order those tiles/minitiles.
 
-### Downloading a Satellite Image
+See: the “create order” examples in [`examples/`](./examples/).
 
-The `PixelSelectionMode` parameter controls which pixels are included:
-- **Intersect**: Includes all pixels that intersect the geometry (default).
-- **Contained**: Includes only pixels fully within the geometry.
+### Order status
 
-You can refer to the example API code for [processing composite image for download](https://github.com/Clearsky-Vision/clearsky_api_tools/blob/main/example_clearsky_api.py#L253)
+You can check status:
+- for **all orders** (list orders), or
+- for a **specific order GUID** (order details)
 
-### Visualizing Acquired Satellite Image
+These are typically free metadata calls and are useful to determine whether an order is ready/up-to-date.
 
-The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g. QGIS) to visualize it. For a true-color image, select the B4, B3, and B2 bands (Red, Green, and Blue) and update the image symbology to stretch the band values (e.g. setting min to 0 and max to 2000) using `stretch to MinMax` contrast enhancement so the colors make sense.
+See: the “list orders” and “get order status” examples in [`examples/python/2_order_status`](./examples/python/2_order_status/).
 
-## Python Scripts And Tools
+You can also see this information by going to https://dashboard.clearsky.vision/
 
-* [Example Code For Interacting with ClearSky API](./example_clearsky_api.py)
-* [Service Class Wrapping ClearSky API](./api_service.py)
-* [Tool for buffering a bounding box for intersect/contains pixel selection](./tools/utm_boundingbox_to_wgs84.py)
-* [Tool for wrapping a wkt within a GeometryCollection as required by tasking orders](./tools/geometrycollection_wrapper.py)
+### Data availability
+
+For a specific date and AOI, you can query availability flags. This is especially helpful when an AOI is covered by multiple different orders.
+
+You can also search for which dates are available in a given AOI and time range.
+
+### Downloading data
+
+Supported download paths:
+- **Composite download** for an AOI (works regardless of whether the underlying order is tile-based or composite-based)
+- **Tile** download (for tile orders)
+- **Minitile** download (for minitile orders)
+
+Downloads return GeoTIFF (or server-side upload via `UploadUrl` where supported).
+
+See: the “download composite”, “download tile/minitile”, examples in [`examples/python/3_download`](./examples/python/3_download/).
+
+### Visualizing acquired satellite imagery
+
+The downloaded data is multi-spectral. Use a GeoTIFF-compatible tool (e.g., QGIS) to visualize it.
+
+For a true-color image:
+- Select the **B4, B3, B2** bands (Red, Green, Blue)
+- Stretch band values (example: min 0, max 2000) using *Stretch to MinMax* contrast enhancement so colors look sensible.
+
+---
+
+## Python Client and Examples
+
+- **Client**: [`clearsky_client.py`](./clearsky_client.py)
+  - Implements authentication, retries, JSON “ServiceResult” error handling, and binary downloads.
+- **Examples**: [`examples/`](./examples/)
+  - Account info + model discovery
+  - Tile search and tile optimization
+  - Task order estimation (price preview) and order creation
+  - Order status checks (single-call)
+  - Availability checks (single-call) and available-date search
+  - Composite/tile/minitile downloads
+
+---
 
 ## Additional Resources
 
-* Service Homepage ([www.clearsky.vision](https://clearsky.vision/))
-* Service Documentation ([www.clearsky.vision/docs](https://docs.clearsky.vision))
-* API Endpoint Documentation ([api.clearsky.vision](https://api.clearsky.vision/))
-* Service Uptime ([uptime.clearsky.vision](https://uptime.clearsky.vision/))
+* Service Homepage: https://clearsky.vision/
+* Service Documentation: https://docs.clearsky.vision/
+* API Endpoint Documentation: https://api.clearsky.vision/
+* Service Uptime: https://uptime.clearsky.vision/
 
 ![ClearSKY Vision](https://clearsky.vision/wp-content/uploads/2024/01/github_banner.png)
 
 ## Frequently Asked Questions
 
 * ***Is the service available in my area?***
-    * The service generally allows for generating cloudless sentinel-2 imagery globally, but some areas have not yet been validated for quality. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (info@clearsky.vision). All new areas start out with testing and free data sharing to ensure the data quality is up to par. You will get plenty of opportunities to test the imagery in your applications. 
-* ***What does synthetic data mean and can I trust it?***
-    * The sentinel-2 imagery data we generate is derived from deep neural networks. This is the only way to extract the necessary information available in the imagery from multiple satellite constellations. We call images derived from this process ‘synthetic’ as to not mislead users about the origin of the data. This also includes natural cloud-free data from Sentinel-2, as this data is still being processed by an artificial intelligence to ensure consistency among other things. The imagery, however, is designed to mimic normal Sentinel-2 imagery minus a few undesirable traits (clouds, shadows, missing area coverage, ...). The imagery you will find here looks and feels like Sentinel-2, and can be swapped in-place in pipelines already using the original Sentinel-2 imagery. If you would like to know more about our testing methods or accuracy, feel free to reach out at info@clearsky.vision.
-* ***Is there any difference between today's data and historical data? Do you use images from the future when generating historic images?***
-    * No, all data has been produced in the same way. This is to ensure consistency throughout our service. However, this also means historical data is produced without any future insights and it is only backward-looking. Our models will not interpolate between the historic date and what we know it will become in the future because they will not ingest future data even if it is available. We only extrapolate from the available historic data, from the multiple satellites we can use, what a clean image looks like.
-* ***I'm receiving error code 500, 400, 401, or other error codes. what do they mean?***
-    * [Check out our error handling documentation](https://docs.clearsky.vision/docs/api-guide/error-codes)
-* ***How does billing work?***
-    * [Check out the billing documentation](https://docs.clearsky.vision/docs/category/billing-guide)
-* ***What do you mean by credits?***
-    * [Read this to understand our credit system](https://docs.clearsky.vision/docs/order-guide/credits-and-data-storage)
-* ***I cannot update an existing order with a new small area?***
-    * Orders have some limitations, check out [our order guide](https://docs.clearsky.vision/docs/order-guide/order-introduction)
+  * The service generally allows generating cloudless Sentinel-2 imagery globally, but some areas have not yet been validated for quality. If you are interested in being one of the first to get access to a new geographical area, consider sending us a shapefile of your area of interest (**info@clearsky.vision**). All new areas start out with testing and free data sharing to ensure the data quality is up to par.
 
-Contact us at info@clearsky.vision for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.
+* ***What does synthetic data mean and can I trust it?***
+  * The Sentinel-2 imagery data we generate is derived from deep neural networks. This is the only way to extract the necessary information available in the imagery from multiple satellite constellations. We call images derived from this process “synthetic” to avoid misleading users about the origin of the data. This also includes natural cloud-free data from Sentinel-2, as this data is still processed by AI to ensure consistency among other things. The imagery is designed to mimic normal Sentinel-2 imagery minus a few undesirable traits (clouds, shadows, missing coverage, ...). If you’d like to know more about our testing methods or accuracy, reach out at **info@clearsky.vision**.
+
+* ***Is there any difference between today's data and historical data? Do you use images from the future when generating historic images?***
+  * No. All data has been produced in the same way to ensure consistency throughout the service. Historical data is produced without any future insights and is strictly backward-looking. Our models will not ingest future data even if it is available.
+
+* ***I'm receiving error code 500, 400, 401, or other error codes. what do they mean?***
+  * Check out our error handling documentation: https://docs.clearsky.vision/docs/api-guide/error-codes
+
+* ***How does billing work?***
+  * Check out the billing documentation: https://docs.clearsky.vision/docs/category/billing-guide
+
+* ***What do you mean by credits?***
+  * Read this to understand our credit system: https://docs.clearsky.vision/docs/order-guide/credits-and-data-storage
+
+* ***I cannot update an existing order with a new small area?***
+  * Orders have some limitations—see our order guide: https://docs.clearsky.vision/docs/order-guide/order-introduction
+
+Contact us at **info@clearsky.vision** for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.
