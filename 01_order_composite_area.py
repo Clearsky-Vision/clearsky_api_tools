@@ -8,9 +8,7 @@ ACCEPT_ESTIMATE = False # Set to True to accept the estimate
 
 WKT_GEOMETRYCOLLECTION = (
     "GEOMETRYCOLLECTION ("
-    "POLYGON ((9.877893206725581 56.47856668238974, 10.196496722350581 56.47856668238974, "
-    "10.196496722350581 56.27782087776097, 9.877893206725581 56.27782087776097, "
-    "9.877893206725581 56.47856668238974))"
+    "POLYGON ((9.563103 50.703336, 9.730644 50.703336, 9.730644 50.80759, 9.563103 50.80759, 9.563103 50.703336))"
     ")"
 )
 
@@ -20,12 +18,12 @@ estimate = client.estimate_task_order(
     wkt=WKT_GEOMETRYCOLLECTION,
     model="Stratus2",
     satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"],
-    storage_months=3,
-    api_requests=5,
+    storage_months=1,
+    api_requests=1,
     image_frequency=2,
     reference_date="2024-01-01",
-    from_date="2024-01-01",
-    to_date=None,
+    from_date="2025-06-01",
+    to_date="2025-06-31",
 )
 
 print(format_order_estimate(estimate))
