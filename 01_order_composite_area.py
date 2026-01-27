@@ -14,16 +14,25 @@ WKT_GEOMETRYCOLLECTION = (
     ")"
 )
 
+model="Stratus2"
+satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"]
+storage_months=1
+api_requests=1
+image_frequency=2
+reference_date="2024-01-01"
+from_date="2025-06-01"
+to_date="2025-06-30"
+
 estimate = client.estimate_task_order(
     wkt=WKT_GEOMETRYCOLLECTION,
-    model="Stratus2",
-    satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"],
-    storage_months=1,
-    api_requests=1,
-    image_frequency=2,
-    reference_date="2024-01-01",
-    from_date="2025-06-01",
-    to_date="2025-06-30",
+    model=model,
+    satellite_constellations=satellite_constellations,
+    storage_months=storage_months,
+    api_requests=api_requests,
+    image_frequency=image_frequency,
+    reference_date=reference_date,
+    from_date=from_date,
+    to_date=to_date,
 )
 
 print(format_order_estimate(estimate))
@@ -35,15 +44,14 @@ if not ACCEPT_ESTIMATE:
 
 order = client.create_task_order(
     wkt=WKT_GEOMETRYCOLLECTION,
-    model="Stratus2",
-    satellite_constellations=["Sentinel1", "Sentinel2", "Landsat89"],
-    storage_months=3,
-    api_requests=5,
-    image_frequency=2,
-    reference_date="2024-01-01",
-    from_date="2024-01-01",
-    to_date=None,
-    geometry_tile_ordering=False,
+    model=model,
+    satellite_constellations=satellite_constellations,
+    storage_months=storage_months,
+    api_requests=api_requests,
+    image_frequency=image_frequency,
+    reference_date=reference_date,
+    from_date=from_date,
+    to_date=to_date,
 )
 
 print("Created order:", order["TaskOrderGuid"])

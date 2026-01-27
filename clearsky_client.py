@@ -369,7 +369,6 @@ class ClearSkyClient:
         from_date: str = "2024-01-01",
         to_date: Optional[str] = None,
         tile_deduplication: bool = False,
-        geometry_tile_ordering: bool = False,
         automatic_order_guid: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a tasking order (subscription/recurring or fixed period) for an AOI or tiles.
@@ -393,7 +392,6 @@ class ClearSkyClient:
 
         1) Geometry-based (composite area):
            - Provide ``wkt`` or ``geojson`` (often as a GeometryCollection)
-           - Set ``geometry_tile_ordering=True`` to let the service determine tile coverage from geometry
 
         2) Tile-based:
            - Provide ``tile_guids`` and/or ``minitile_guids`` (typically discovered via ``search_tiles``
@@ -465,8 +463,8 @@ class ClearSkyClient:
         body = {
             "Wkt": wkt,
             "GeoJson": geojson,
-            "TileGuids": tile_guids or [],
-            "MiniTileGuids": minitile_guids or [],
+            "TileGuids": tile_guids,
+            "MiniTileGuids": minitile_guids,
             "SatelliteConstellations": satellite_constellations,
             "Model": model,
             "StorageMonths": storage_months,
@@ -476,7 +474,6 @@ class ClearSkyClient:
             "From": from_date,
             "To": to_date,
             "TileDeduplication": tile_deduplication,
-            "GeometryTileOrdering": geometry_tile_ordering,
         }
 
         resp = self._request("POST", "/api/tasking/orders", params=params, json_body=body)
@@ -936,8 +933,8 @@ class ClearSkyClient:
         body: Dict[str, Any] = {
             "Wkt": wkt,
             "GeoJson": geojson,
-            "TileGuids": tile_guids or [],
-            "MiniTileGuids": minitile_guids or [],
+            "TileGuids": tile_guids,
+            "MiniTileGuids": minitile_guids,
             "SatelliteConstellations": satellite_constellations,
             "Model": model,
             "StorageMonths": storage_months,
