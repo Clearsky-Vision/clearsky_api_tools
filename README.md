@@ -96,13 +96,13 @@ Models define how imagery is fused and which satellites are supported:
 
 You can also discover available models programmatically via the API (and via the corresponding example scripts).
 
-### Tile vs Composite Ordering
+### Polygon vs Tile Ordering
 
-Ordering satellite imagery data can be done through **composite ordering** (AOI-based) or **tile/minitile ordering** (GUID-based). See our ordering docs for details:
+Ordering satellite imagery data can be done through **polygon ordering** (AOI-based) or **tile/minitile ordering** (GUID-based). See our ordering docs for details:
 - https://docs.clearsky.vision/docs/order-guide/order-introduction
 
 In general:
-- **Composite ordering** is convenient when you want to manage small and irregular areas.
+- **Polygon ordering** is convenient when you want to manage small and irregular areas.
 - **Tile/minitile ordering** is cost-effective when your AOI aligns well with tile coverage.
 - You can also request a **price-optimized tile selection** for a WKT GeometryCollection using the tile optimization endpoint and then create a tile/minitile order from the returned GUIDs.
 - Mini-tile orders have a default 50% rebate compared to composite orders, meaning that if your usage requires more than 50% of a mini-tile it is more cost effecient to order the mini-tile than doing a composite order in the area. Tiles have a base rebate of 80%, meaning that if you require more than 40% of a tile it makes sense to buy the full tile instead of minitiles.
