@@ -15,7 +15,7 @@
   * [API Credentials](#api-credentials)
   * [Authentication](#authentication)
   * [Data Specifications and Available Models](#data-specifications-and-available-models)
-  * [Tile vs Composite Ordering](#tile-vs-composite-ordering)
+  * [Polygon vs Tile Ordering](#tile-vs-composite-ordering)
 * [Key Features](#key-features)
   * [Estimate price before ordering](#estimate-price-before-ordering)
   * [Create orders](#create-orders)
@@ -112,7 +112,7 @@ In general:
 Once an area is ordered, availability and downloads follow a consistent pattern:
 - You can check **order status** for all orders or a specific order.
 - You can check **availability** for a specific date/AOI (even when availability depends on multiple different orders).
-- You can download a **composite** for an AOI regardless of whether the underlying order is tile-based or composite-based.
+- You can download a **composite** for an AOI regardless of whether the underlying order is tile-based or polygon-based.
 
 ---
 
@@ -154,7 +154,7 @@ You can also search for which dates are available in a given AOI and time range.
 ### Downloading data
 
 Supported download paths:
-- **Composite download** for an AOI (works regardless of whether the underlying order is tile-based or composite-based)
+- **Composite download** for an AOI (works regardless of whether the underlying order is tile-based or polygon-based)
 - **Tile** download (for tile orders)
 - **Minitile** download (for minitile orders)
 
@@ -189,11 +189,10 @@ For a true-color image:
 ## Additional Resources
 
 * Service Homepage: https://clearsky.vision/
+* Service Dashboard: https://dashboard.clearsky.vision/
 * Service Documentation: https://docs.clearsky.vision/
 * API Endpoint Documentation: https://api.clearsky.vision/
 * Service Uptime: https://uptime.clearsky.vision/
-
-![ClearSKY Vision](https://clearsky.vision/wp-content/uploads/2024/01/github_banner.png)
 
 ## Frequently Asked Questions
 
