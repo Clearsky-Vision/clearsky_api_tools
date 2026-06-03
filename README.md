@@ -89,17 +89,17 @@ export CLEARSKY_BASE_URL="https://api.clearsky.vision"   # optional (default sho
 ### Data Specifications and Available Models
 
 See our data specification documentation for information about the imagery:
-- https://docs.clearsky.vision/docs/data-models/data-specs
+- https://docs.clearsky.vision/product-data/data-specification
 
 Models define how imagery is fused and which satellites are supported:
-- https://docs.clearsky.vision/docs/data-models/fusion-models
+- https://docs.clearsky.vision/product-data/models-stratus-nimbus
 
 You can also discover available models programmatically via the API (and via the corresponding example scripts).
 
 ### Polygon vs Tile Ordering
 
 Ordering satellite imagery data can be done through **polygon ordering** (AOI-based) or **tile/minitile ordering** (GUID-based). See our ordering docs for details:
-- https://docs.clearsky.vision/docs/order-guide/order-introduction
+- https://docs.clearsky.vision/ordering-data/choose-order-type
 
 In general:
 - **Polygon ordering** is convenient when you want to manage small and irregular areas.
