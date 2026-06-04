@@ -48,8 +48,8 @@ This repository contains:
   - estimate price → create order → check status/availability → download
 
 We also recommend reading:
-- API error codes: https://docs.clearsky.vision/docs/api-guide/error-codes
-- API request limits: https://docs.clearsky.vision/docs/api-guide/request-limits
+- API error codes: https://docs.clearsky.vision/api-reference/error-codes
+- API request limits: https://docs.clearsky.vision/api-reference/request-limits
 
 For further details or support, contact **info@clearsky.vision**.
 
@@ -206,15 +206,15 @@ For a true-color image:
   * No. All data has been produced in the same way to ensure consistency throughout the service. Historical data is produced without any future insights and is strictly backward-looking. Our models will not ingest future data even if it is available.
 
 * ***I'm receiving error code 500, 400, 401, or other error codes. what do they mean?***
-  * Check out our error handling documentation: https://docs.clearsky.vision/docs/api-guide/error-codes
+  * Check out our error handling documentation: https://docs.clearsky.vision/api-reference/error-codes
 
 * ***How does billing work?***
-  * Check out the billing documentation: https://docs.clearsky.vision/docs/category/billing-guide
+  * Check out the billing documentation: https://docs.clearsky.vision/pricing-billing/pricing-overview
 
 * ***What do you mean by credits?***
-  * Read this to understand our credit system: https://docs.clearsky.vision/docs/order-guide/credits-and-data-storage
+  * Read this to understand our credit system: https://docs.clearsky.vision/pricing-billing/credits-order-vs-processing-units/
 
 * ***I cannot update an existing order with a new small area?***
-  * Orders have some limitations—see our order guide: https://docs.clearsky.vision/docs/order-guide/order-introduction
+  * Orders have some limitations. See our order guide: https://docs.clearsky.vision/ordering-data/ordering-overview
 
 Contact us at **info@clearsky.vision** for more info or follow us on [LinkedIn](https://www.linkedin.com/company/clearskyvision) for updates.
